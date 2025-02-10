@@ -15,6 +15,20 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
 | Count-then-move | First counts elements, then moves them to final positions in two phases |
 | Parallel Buffers | Uses separate buffer spaces for each thread to avoid conflicts |
 
+## How to Run
+
+- To compile project: `make``
+- To compile and run project: `./run.sh` with additional flags.
+  Format `./run.sh <algorithm> <n_tuples> <n_hash_bits> <n_threads>`
+  
+  Examples:
+  ```sh
+  # Run independent partitioning
+  ./run.sh ind 1000 8 26
+  # Run concurrent partitioning
+  ./run.sh con 1000 8 26
+  ```
+
 ## Course Context
 
 This paper fits into the course of Computer Systems Performance, given that threads and shared resources were found to have a direct effect on overall performance. The choice of partitioning technique should therefore ideally have high performance, and the goal of this assignment is to design and run experiments that compare performance for two of these techniques.
