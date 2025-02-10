@@ -1,20 +1,31 @@
-CC = gcc
-CFLAGS = -Wall -Werror -I/usr/include/openssl
-LDFLAGS = -lssl -lcrypto
+CC := gcc
+CFLAGS := -Wall -Werror -O2
+LDFLAGS :=
 
-TARGET = partition
-SOURCES = main.c partitioning.c concurrent.c independent.c
-OBJECTS = $(SOURCES:.c=.o)
+SRC_DIR := .
+BUILD_DIR := build
 
-all: $(TARGET)
+TARGET := partition
+SOURCES := $(wildcard $(SRC_DIR)/*.c)
+OBJECTS := $(SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
-$(TARGET): $(OBJECTS)
-    $(CC) $(OBJECTS) -o $(TARGET)
+.DEFAULT_GOAL := all
 
-%.o: %.c
-    $(CC) $(CFLAGS) -c $< -o $@
+# Targets
+all: $(BUILD_DIR)/$(TARGET)
+
+$(BUILD_DIR)/$(TARGET): $(OBJECTS)
+	@mkdir -p $(dir $@)
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+run: $(BUILD_DIR)/$(TARGET)
+	./$(BUILD_DIR)/$(TARGET) $(ARGS)
 
 clean:
-    rm -f $(OBJECTS) $(TARGET)
+	rm -rf $(BUILD_DIR)
 
-.PHONY: all clean
+.PHONY: all run clean

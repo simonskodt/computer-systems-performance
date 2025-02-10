@@ -1,20 +1,12 @@
 #include "partitioning.h"
 
-void print_usage() {
-    printf("Usage: ./partition <algorithm> <n_tuples> <n_hash_bits> <n_threads>\n");
-    printf("  algorithm:   'independent' or 'concurrent'\n");
-    printf("  n_tuples:    number of tuples to partition\n");
-    printf("  n_hash_bits: number of hash bits to use\n");
-    printf("  n_threads:   number of threads to use\n");
-}
+void print_usage();
+Tuple* setup_tuples(size_t n_tuples);
 
-// Examples flags
-// ./partition independent 100, 4, 8
-// ./partition concurrect 100, 4, 8
-void main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     if (argc != 5) {
         print_usage();
-        return 1;
+        return EXIT_FAILURE;
     }
 
     char *algorithm = argv[1];
@@ -23,28 +15,45 @@ void main(int argc, char *argv[]) {
     size_t n_threads = atoi(argv[4]);
 
     if (n_tuples <= 0 || n_hash_bits <= 0 || n_threads <= 0) {
-        printf("Error: All arguments must be positive\n");
-        return 1;
+        fprintf(stderr, "Error: All arguments must be positive\n");
+        return EXIT_FAILURE;
     }
 
-    Tuple *tuples = malloc(n_tuples * sizeof(Tuple));
+    Tuple* tuples = setup_tuples(n_tuples);
+
+    if (strcmp(algorithm, "independent") == 0) {
+        independent_output(tuples, n_tuples, n_hash_bits, n_threads);
+    } else if (strcmp(algorithm, "concurrent") == 0) {
+        concurrent_output(tuples, n_tuples, n_hash_bits, n_threads);
+    } else {
+        fprintf(stderr, "Error: Unknown algorithm '%s'\n", algorithm);
+        free(tuples);
+        return EXIT_FAILURE;
+    }
+
+    free(tuples);
+    return EXIT_SUCCESS;
+}
+
+void print_usage() {
+    printf("Usage: ./partition <algorithm> <n_tuples> <n_hash_bits> <n_threads>\n");
+    printf("  algorithm:   'independent' or 'concurrent'\n");
+    printf("  n_tuples:    number of tuples to partition\n");
+    printf("  n_hash_bits: number of hash bits to use\n");
+    printf("  n_threads:   number of threads to use\n");
+}
+
+Tuple* setup_tuples(size_t n_tuples) {
+    Tuple* tuples = malloc(n_tuples * sizeof(Tuple));
+    if (tuples == NULL) {
+        perror("Could not allocate memory for tuples");
+        exit(EXIT_FAILURE);
+    }
 
     for (size_t i = 0; i < n_tuples; i++) {
         tuples[i].key = i;
         tuples[i].value = rand() % 1000;
-
     }
 
-    if (strcmp(algorithm, "independent") == 0) {
-        independent_partition(tuples, n_tuples, n_hash_bits, n_threads);
-    } else if (strcmp(algorithm, "concurrent") == 0) {
-        concurrent_partition(tuples, n_tuples, n_hash_bits, n_threads);
-    } else {
-        printf("Error: Unknown algorithm '%s'\n", algorithm);
-        free(tuples);
-        return 1;
-    }
-
-    free(tuples);
-    return 0;
+    return tuples;
 }
