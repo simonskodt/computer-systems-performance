@@ -1,5 +1,6 @@
 #include "partitioning.h"
 
-int openssl_hashing(unsigned int key, unsigned int hash_bits) {
-    return 0; // key % (1 << hash_bits);
+int mod_hashing(uint64_t key, size_t hash_bits) {
+    size_t n_partitions = 1 << hash_bits;
+    return key % n_partitions;
 }
