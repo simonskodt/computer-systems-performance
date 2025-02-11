@@ -6,8 +6,6 @@
 #include <pthread.h>
 #include <string.h>
 
-#define COMPUTE_HASH_MOD(hash, hash_bit) ((hash) % (hash_bit))
-
 typedef struct {
     uint64_t key;
     uint64_t value;
