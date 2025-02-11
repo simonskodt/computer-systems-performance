@@ -53,7 +53,11 @@ int main(int argc, char *argv[]) {
         printf("\n-------------------------\n");
         printf("Benchmark Results:\n");
         printf("-------------------------\n");
-        printf("Algorithm:     %s\n", algorithm);
+        printf("Algorithm:     %s\n",  algorithm);
+        printf("Hash bits:     %zu\n", n_hash_bits);
+        printf("Threads:       %zu\n", n_threads);
+        printf("Tuples:        %zu\n", n_tuples);
+        printf("-------------------------\n");
         printf("Time elapsed:  %ld ms\n", elapsed_time_ms);
         printf("-------------------------\n");
     }
