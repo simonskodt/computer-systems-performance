@@ -1,4 +1,4 @@
-#include "partitioning.h"
+#include "hash.h"
 
 int mod_hashing(uint64_t key, size_t hash_bits) {
     // Partitions are calculated by 2^(hash_bits), example:
