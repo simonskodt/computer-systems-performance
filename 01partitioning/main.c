@@ -1,4 +1,5 @@
 #include "partitioning.h"
+#include "timer.h"
 
 // Function prototypes
 void print_usage();
@@ -30,18 +31,35 @@ int main(int argc, char *argv[]) {
     Tuple* tuples = setup_tuples(n_tuples);
     pthread_t* threads = setup_threads(n_threads);
 
+    // Start timer
+    struct timespec start_time = start_timer();
+
     // Match on selected algorithm
+    int result;
     if (strcmp(algorithm, "independent") == 0) {
-        independent_output(tuples, n_tuples, n_hash_bits, n_threads);
+        result = independent_output(tuples, n_tuples, n_hash_bits, n_threads);
     } else if (strcmp(algorithm, "concurrent") == 0) {
-        concurrent_output(tuples, n_tuples, n_hash_bits, n_threads);
+        result = concurrent_output(tuples, n_tuples, n_hash_bits, n_threads);
     } else {
         fprintf(stderr, "Error: Unknown algorithm '%s'\n", algorithm);
         free(tuples);
+        free(threads);
         return EXIT_FAILURE;
     }
 
+    // End timer
+    long elapsed_time_ms = end_timer(start_time);
+    if (result == EXIT_SUCCESS) {
+        printf("\n-------------------------\n");
+        printf("Benchmark Results:\n");
+        printf("-------------------------\n");
+        printf("Algorithm:     %s\n", algorithm);
+        printf("Time elapsed:  %ld ms\n", elapsed_time_ms);
+        printf("-------------------------\n");
+    }
+
     free(tuples);
+    free(threads);
     return EXIT_SUCCESS;
 }
 
