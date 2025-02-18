@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include <string.h>
 #include "colors.h"
-#include <hash.h>
+#include "hash.h"
 
 #define COMPUTE_PARTITIONS(hash_bit) (1 << hash_bit);
 
