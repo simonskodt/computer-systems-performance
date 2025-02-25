@@ -1,4 +1,5 @@
 #include "partitioning.h"
+#include <stdatomic.h>
 
 typedef struct {
     int thread_id;
@@ -9,7 +10,7 @@ typedef struct {
     size_t n_hash_bits;
     int n_partitions;
     Tuple **partitions;
-    size_t *partition_sizes;
+    atomic_size_t *partition_sizes;
 } ConcurrentThread;
 
 void* concurrent_thread_function(void* args);
@@ -29,7 +30,7 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
 
     // Partitions
     Tuple **partitions = malloc(n_partitions * sizeof(Tuple*));
-    size_t *partitions_sizes = calloc(n_partitions, sizeof(size_t));
+    atomic_size_t *partitions_sizes = (atomic_size_t *)calloc(n_partitions, sizeof(atomic_size_t));
     if (partitions == NULL || partitions_sizes == NULL) {
         perror("Could not allocate memory for partitions");
         free(thread_args);
@@ -85,7 +86,7 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
         printf("Partition: %zu\n", i);
         for (size_t j = 0; j < n_partitions * sizeof(size_t); j++) {
             printf("Tuple: %llu\n", partitions[i][j].key);
-        }   
+        }
     }
 
     // Free memory
@@ -112,9 +113,8 @@ void* concurrent_thread_function(void* args) {
             c_thread->n_hash_bits
         );
 
-        size_t partition_size = c_thread->partition_sizes[partition_index];
-        c_thread->partitions[partition_index][partition_size] = tuple;
-        c_thread->partition_sizes[partition_index]++;
+        size_t curr_partition_size = atomic_fetch_add(&c_thread->partition_sizes[partition_index], 1);
+        c_thread->partitions[partition_index][curr_partition_size] = tuple;
     }
 
     printf(COLOR_RED "Thread %d stopping...\n" COLOR_RESET, c_thread->thread_id);
