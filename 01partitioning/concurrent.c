@@ -2,10 +2,11 @@
 
 typedef struct {
     int thread_id;
+    size_t start_index;
+    size_t end_index;
     Tuple *tuples;
     size_t n_tuples;
     size_t n_hash_bits;
-    size_t n_threads;
     int n_partitions;
     Tuple **partitions;
     size_t *partition_sizes;
@@ -27,7 +28,7 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
     }
 
     // Partitions
-    Tuple **partitions = malloc(n_partitions * sizeof(Tuple*)); // wtf
+    Tuple **partitions = malloc(n_partitions * sizeof(Tuple*));
     size_t *partitions_sizes = calloc(n_partitions, sizeof(size_t));
     if (partitions == NULL || partitions_sizes == NULL) {
         perror("Could not allocate memory for partitions");
@@ -52,15 +53,21 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
         }
     }
 
+    size_t tuples_per_thread = n_tuples / n_threads;
+    size_t remainder = n_tuples % n_threads;
+    size_t start = 0;
     for (size_t i = 0; i < n_threads; i++) {
         thread_args[i].thread_id = i+1; // 1 indexed
+        thread_args[i].start_index = start;
+        size_t extra = (i < remainder ? 1 : 0);
+        thread_args[i].end_index = start + tuples_per_thread + extra;
         thread_args[i].tuples = tuples;
         thread_args[i].n_tuples = n_tuples;
         thread_args[i].n_hash_bits = n_hash_bits;
-        thread_args[i].n_threads = n_threads;
         thread_args[i].n_partitions = n_partitions;
         thread_args[i].partitions = partitions;
         thread_args[i].partition_sizes = partitions_sizes;
+        start = thread_args[i].end_index;
     
         if (pthread_create(&threads[i], NULL, concurrent_thread_function, &thread_args[i]) != 0) {
             perror("Could not create thread");
@@ -68,10 +75,17 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
             return EXIT_FAILURE;
         }
     }
-    
-
+     
     for (size_t i = 0; i < n_threads; i++) {
         pthread_join(threads[i], NULL);
+    }
+
+    // Printing the partitions and tuple keys
+    for (size_t i = 0; i < n_partitions; i++) {
+        printf("Partition: %zu\n", i);
+        for (size_t j = 0; j < n_partitions * sizeof(size_t); j++) {
+            printf("Tuple: %llu\n", partitions[i][j].key);
+        }   
     }
 
     // Free memory
@@ -90,20 +104,17 @@ void* concurrent_thread_function(void* args) {
 
     printf(COLOR_GREEN "Thread %d starting...\n" COLOR_RESET, c_thread->thread_id);
 
-    size_t tuples_per_thread = c_thread->n_tuples / c_thread->n_threads;  // uniform distribution
-    size_t start_index = c_thread->n_tuples * tuples_per_thread;
-    size_t end_index = start_index + tuples_per_thread;
+    for (size_t i = c_thread->start_index; i < c_thread->end_index; i++) {
+        Tuple tuple = c_thread->tuples[i];
 
-    for (size_t i = start_index; i < end_index; i++) {
-        int partition_index = mod_hashing(
-            c_thread->tuples[i].key,
+        uint64_t partition_index = mod_hashing(
+            tuple.key,
             c_thread->n_hash_bits
         );
 
-        size_t partition_size = c_thread->partition_sizes[partition_index]++;
-        c_thread->partitions[partition_index][partition_size] = c_thread->tuples[i];
-        printf("Partition %d: \n", partition_index);
-        printf("Tuple key %llu: \n", c_thread->tuples[i].key);
+        size_t partition_size = c_thread->partition_sizes[partition_index];
+        c_thread->partitions[partition_index][partition_size] = tuple;
+        c_thread->partition_sizes[partition_index]++;
     }
 
     printf(COLOR_RED "Thread %d stopping...\n" COLOR_RESET, c_thread->thread_id);
