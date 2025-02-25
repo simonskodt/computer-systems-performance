@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "partitioning.h"
+#include "colors.h"
 
 #define COMPUTE_HASH_MOD(hash, hash_bit) ((hash) % (hash_bit))
 
@@ -34,7 +35,7 @@ void* thread_func(void* arg) {
     return NULL;
 }
 
-int independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads) {
+int independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads, pthread_t* threads) {
     size_t num_partitions = 1UL << n_hash_bits;
 
     PartitionBuffer **thread_buffers = malloc(n_threads * sizeof(PartitionBuffer*));
