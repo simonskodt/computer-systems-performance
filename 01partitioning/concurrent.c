@@ -84,7 +84,7 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
     // Printing the partitions and tuple keys
     for (size_t i = 0; i < n_partitions; i++) {
         printf("Partition: %zu\n", i);
-        for (size_t j = 0; j < n_partitions * sizeof(size_t); j++) {
+        for (size_t j = 0; j < tuples_per_partition; j++) {
             printf("Tuple: %llu\n", partitions[i][j].key);
         }
     }
