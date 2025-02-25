@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #define COMPUTE_HASH_MOD(hash, hash_bit) ((hash) % (hash_bit));
 

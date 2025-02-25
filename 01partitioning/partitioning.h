@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include <stdint.h>
 #include "colors.h"
 #include "hash.h"
 
