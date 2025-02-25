@@ -1,0 +1,11 @@
+#ifndef HASH
+#define HASH
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define COMPUTE_HASH_MOD(hash, hash_bit) ((hash) % (hash_bit));
+
+int mod_hashing(uint64_t key, size_t hash_bits);
+
+#endif // HASH
