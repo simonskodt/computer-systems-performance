@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     // Match on selected algorithm
     int result;
     if (strcmp(algorithm, "independent") == 0) {
-        result = independent_output(tuples, n_tuples, n_hash_bits, n_threads, threads);
+        result = independent_output(tuples, n_tuples, n_hash_bits, n_threads);
     } else if (strcmp(algorithm, "concurrent") == 0) {
         result = concurrent_output(tuples, n_tuples, n_hash_bits, n_threads, threads);
     } else {
