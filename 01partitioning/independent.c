@@ -33,7 +33,7 @@ void* thread_func(void* arg) {
     return NULL;
 }
 
-int independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads) {
+long independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads) {
     size_t num_partitions = 1UL << n_hash_bits;
 
     PartitionBuffer **thread_buffers = malloc(n_threads * sizeof(PartitionBuffer*));
@@ -74,6 +74,9 @@ int independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_
         return -1;
     }
 
+    // Start timer
+    struct timespec start_time = start_timer();
+
     size_t tuples_per_thread = n_tuples / n_threads;
     size_t remainder = n_tuples % n_threads;
     size_t start = 0;
@@ -102,6 +105,9 @@ int independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_
         pthread_join(threads[t], NULL);
     }
 
+    // End timer
+    long elapsed_time_ms = end_timer(start_time);
+
     for (size_t t = 0; t < n_threads; t++) {
         for (size_t p = 0; p < num_partitions; p++) {
             free(thread_buffers[t][p].tuples);
@@ -112,5 +118,5 @@ int independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_
     free(threads);
     free(thread_data);
 
-    return 0;
+    return elapsed_time_ms;
 }
