@@ -20,14 +20,18 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
 - To compile project: `make`
 - To compile and run project: `./run.sh` with additional flags.
 
-  Format `./run.sh <algorithm> <n_tuples> <n_hash_bits> <n_threads>`.
+  Usage: `./partition <algorithm> <n_tuples> <n_hash_bits> <n_threads>`
+  - `algorithm`:   'ind' for independent or 'con' for concurrent
+  - `n_hash_bits`: number of hash bits to use
+  - `n_threads`:   number of threads to use
+  - `n_tuples`:    number of tuples to partition (optional, default 2^(24)
 
   Examples:
   ```sh
   # Run independent partitioning
-  ./run.sh ind 1000 8 26
+  ./run.sh ind 8 4
   # Run concurrent partitioning
-  ./run.sh con 1000 8 26
+  ./run.sh con 8 4
   ```
 
 ## Course Context
