@@ -9,6 +9,7 @@
 #include "hash.h"
 
 #define COMPUTE_PARTITIONS(hash_bit) (1 << hash_bit);
+#define THROUGHPUT(tuples, milliseconds) ((size_t)(tuples / ((milliseconds) / 1000.0)));
 
 typedef struct {
     uint64_t key;
