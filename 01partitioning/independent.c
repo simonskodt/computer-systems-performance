@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "partitioning.h"
-
-#define COMPUTE_HASH_MOD(hash, hash_bit) ((hash) % (hash_bit))
+#include "colors.h"
 
 typedef struct {
     Tuple *tuples;
