@@ -82,12 +82,12 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
     }
 
     // Printing the partitions and tuple keys
-    for (size_t i = 0; i < n_partitions; i++) {
-        printf("Partition: %zu\n", i);
-        for (size_t j = 0; j < tuples_per_partition; j++) {
-            printf("Tuple: %llu\n", partitions[i][j].key);
-        }
-    }
+    // for (size_t i = 0; i < n_partitions; i++) {
+    //     printf("Partition: %zu\n", i);
+    //     for (size_t j = 0; j < tuples_per_partition; j++) {
+    //         printf("Tuple: %llu\n", partitions[i][j].key);
+    //     }
+    // }
 
     // Free memory
     free(thread_args);
@@ -103,7 +103,7 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
 void* concurrent_thread_function(void* args) {
     ConcurrentThread* c_thread = (ConcurrentThread*) args;
 
-    printf(COLOR_GREEN "Thread %d starting...\n" COLOR_RESET, c_thread->thread_id);
+    // printf(COLOR_GREEN "Thread %d starting...\n" COLOR_RESET, c_thread->thread_id);
 
     for (size_t i = c_thread->start_index; i < c_thread->end_index; i++) {
         Tuple tuple = c_thread->tuples[i];
@@ -117,7 +117,7 @@ void* concurrent_thread_function(void* args) {
         c_thread->partitions[partition_index][curr_partition_size] = tuple;
     }
 
-    printf(COLOR_RED "Thread %d stopping...\n" COLOR_RESET, c_thread->thread_id);
+    // printf(COLOR_RED "Thread %d stopping...\n" COLOR_RESET, c_thread->thread_id);
 
     return NULL;
 }
