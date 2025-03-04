@@ -15,11 +15,15 @@ typedef struct {
 
 void* concurrent_thread_function(void* args);
 
-int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads, pthread_t* threads) {
-    printf(COLOR_GREEN "\nRunning concurrent partitioning..." COLOR_RESET "\n");
-
+long concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads) {
     int n_partitions = COMPUTE_PARTITIONS(n_hash_bits);
     size_t tuples_per_partition = (n_tuples / n_partitions) * 1.5; // 50% larger than expected
+
+    pthread_t* threads = malloc(n_threads * sizeof(pthread_t));
+    if (threads == NULL) {
+        perror("Could not allocate memory for threads");
+        exit(EXIT_FAILURE);
+    }
 
     // Thread structs
     ConcurrentThread* thread_args = malloc(n_threads * sizeof(ConcurrentThread));
@@ -53,6 +57,9 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
             return EXIT_FAILURE;
         }
     }
+
+    // Start timer
+    struct timespec start_time = start_timer();
 
     size_t tuples_per_thread = n_tuples / n_threads;
     size_t remainder = n_tuples % n_threads;
@@ -89,6 +96,9 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
     //     }
     // }
 
+    // End timer
+    long elapsed_time_ms = end_timer(start_time);
+
     // Free memory
     free(thread_args);
     for (int i = 0; i < n_partitions; i++) {
@@ -97,7 +107,7 @@ int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t
     free(partitions);
     free(partitions_sizes);
 
-    return EXIT_SUCCESS;
+    return elapsed_time_ms;
 }
 
 void* concurrent_thread_function(void* args) {
