@@ -19,9 +19,9 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
 
 - To compile project: `make`
 - To compile and run project: `./run.sh` with additional flags.
-  
+
   Format `./run.sh <algorithm> <n_tuples> <n_hash_bits> <n_threads>`.
-  
+
   Examples:
   ```sh
   # Run independent partitioning
