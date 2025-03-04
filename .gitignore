@@ -213,4 +213,10 @@ tags
 # Extras for this project
 partition
 
+# Python virtual environment
+/.venv/
+
+# images
+*.png
+
 # End of https://www.toptal.com/developers/gitignore/api/c,visualstudiocode,cmake,macos,vim,emacs,linux
