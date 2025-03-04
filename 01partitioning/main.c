@@ -1,14 +1,16 @@
 #include "partitioning.h"
-#include "timer.h"
 #include "colors.h"
 
 // Function prototypes
+void local_bencemark_results(char *algorithm, size_t n_hash_bits, size_t n_threads, 
+    size_t n_tuples, long elapsed_time_ms, size_t throughput_millions);
+void server_benchmark_results(long elapsed_time_ms, size_t throughput_millions);
 void print_usage();
 Tuple* setup_tuples(size_t n_tuples);
-pthread_t* setup_threads(size_t n_threads);
 
 int main(int argc, char *argv[]) {
-    if (argc != 4 && argc != 5) {
+    if (argc != 3 && argc != 4) {
+        fprintf(stderr, "Error: Incorrect number of arguments\n");
         print_usage();
         return EXIT_FAILURE;
     }
@@ -25,49 +27,56 @@ int main(int argc, char *argv[]) {
 
     if (n_hash_bits <= 0 || n_threads <= 0 || n_tuples <= 0) {
         fprintf(stderr, "Error: All arguments must be positive\n");
+        print_usage();
         return EXIT_FAILURE;
     }
 
     // Setup tuples and threads
     Tuple* tuples = setup_tuples(n_tuples);
-    pthread_t* threads = setup_threads(n_threads);
-
-    // Start timer
-    struct timespec start_time = start_timer();
 
     // Match on selected algorithm
-    int result;
+    long elapsed_time_ms;
     if (strcmp(algorithm, "independent") == 0) {
-        result = independent_output(tuples, n_tuples, n_hash_bits, n_threads);
+        elapsed_time_ms = independent_output(tuples, n_tuples, n_hash_bits, n_threads);
     } else if (strcmp(algorithm, "concurrent") == 0) {
-        result = concurrent_output(tuples, n_tuples, n_hash_bits, n_threads, threads);
+        elapsed_time_ms = concurrent_output(tuples, n_tuples, n_hash_bits, n_threads);
     } else {
         fprintf(stderr, "Error: Unknown algorithm '%s'\n", algorithm);
         free(tuples);
-        free(threads);
         return EXIT_FAILURE;
     }
 
-    // End timer
-    long elapsed_time_ms = end_timer(start_time);
     size_t throughput = THROUGHPUT(n_tuples, elapsed_time_ms);
-    if (result == EXIT_SUCCESS) {
-        printf(COLOR_YELLOW "\n-----------------------------------\n" COLOR_RESET);
-        printf(COLOR_YELLOW "Benchmark Results:\n"                    COLOR_RESET);
-        printf(COLOR_YELLOW "-----------------------------------\n"   COLOR_RESET);
-        printf("Algorithm:     %s\n",  algorithm);
-        printf("Hash bits:     %zu\n", n_hash_bits);
-        printf("Threads:       %zu\n", n_threads);
-        printf("Tuples:        %zu\n", n_tuples);
-        printf(COLOR_YELLOW "\n-----------------------------------\n" COLOR_RESET);
-        printf("Elapsed time:  %ld ms\n", elapsed_time_ms);
-        printf("Throughput:    %zu million tuples/s\n", throughput / 1000000);
-        printf(COLOR_YELLOW "-----------------------------------\n"   COLOR_RESET);
-    }
+    // Rounds the throughput to the nearest million.
+    // For example: throughput is 1,499,999, it will be rounded to 1 million.
+    // If throughput is 1,500,000, it will be rounded to 2 million.
+    size_t throughput_millions = (throughput + 500000) / 1000000; 
+
+    server_benchmark_results(elapsed_time_ms, throughput_millions);
 
     free(tuples);
-    free(threads);
     return EXIT_SUCCESS;
+}
+
+void local_benchmark_results(char *algorithm, size_t n_hash_bits, size_t n_threads, 
+        size_t n_tuples, long elapsed_time_ms, size_t throughput_millions) {
+    printf(COLOR_YELLOW "\n-----------------------------------\n" COLOR_RESET);
+    printf(COLOR_YELLOW "Benchmark Results:\n" COLOR_RESET);
+    printf(COLOR_YELLOW "-----------------------------------\n" COLOR_RESET);
+    printf("Algorithm:     %s\n", algorithm);
+    printf("Hash bits:     %zu\n", n_hash_bits);
+    printf("Threads:       %zu\n", n_threads);
+    printf("Tuples:        %zu\n", n_tuples);
+    printf(COLOR_YELLOW "\n-----------------------------------\n" COLOR_RESET);
+    printf("Elapsed time:  %ld ms\n", elapsed_time_ms);
+    printf("Throughput:    %zu million tuples/s\n", throughput_millions);
+    printf(COLOR_YELLOW "-----------------------------------\n" COLOR_RESET);
+}
+
+void server_benchmark_results(long elapsed_time_ms, size_t throughput_millions) {
+    printf("Elapsed time: %ld ms\n", elapsed_time_ms);
+    printf("Throughput: %zu million tuples/s\n", throughput_millions);
+    printf("-----------------------------------\n");
 }
 
 void print_usage() {
@@ -100,14 +109,4 @@ Tuple* setup_tuples(size_t n_tuples) {
     }
 
     return tuples;
-}
-
-pthread_t* setup_threads(size_t n_threads) {
-    pthread_t* threads = malloc(n_threads * sizeof(pthread_t));
-    if (threads == NULL) {
-        perror("Could not allocate memory for threads");
-        exit(EXIT_FAILURE);
-    }
-
-    return threads;
 }
