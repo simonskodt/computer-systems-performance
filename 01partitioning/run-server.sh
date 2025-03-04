@@ -8,8 +8,8 @@ mkdir -p "$folder_name"
 for hash in "${hash_bits[@]}"; do
     for thread in "${threads[@]}"; do
         for ((i=0; i<NUM_ITERATIONS; i++)); do
-            ./run.sh ind $hash $thread >> "${folder_name}/ind_output_hash_${hash}_threads_${thread}.txt"
-            ./run.sh con $hash $thread >> "${folder_name}/con_output_hash_${hash}_threads_${thread}.txt"
+            ./run.sh ind $hash $thread >> "${folder_name}/ind_${hash}hash_${thread}thread.txt"
+            ./run.sh con $hash $thread >> "${folder_name}/con_${hash}hash_${thread}thread.txt"
         done
     done
 done
