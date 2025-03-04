@@ -50,17 +50,19 @@ int main(int argc, char *argv[]) {
 
     // End timer
     long elapsed_time_ms = end_timer(start_time);
+    size_t throughput = THROUGHPUT(n_tuples, elapsed_time_ms);
     if (result == EXIT_SUCCESS) {
-        printf(COLOR_YELLOW "\n-------------------------\n" COLOR_RESET);
+        printf(COLOR_YELLOW "\n-----------------------------------\n" COLOR_RESET);
         printf(COLOR_YELLOW "Benchmark Results:\n"          COLOR_RESET);
-        printf(COLOR_YELLOW "-------------------------\n"   COLOR_RESET);
+        printf(COLOR_YELLOW "-----------------------------------\n"   COLOR_RESET);
         printf("Algorithm:     %s\n",  algorithm);
         printf("Hash bits:     %zu\n", n_hash_bits);
         printf("Threads:       %zu\n", n_threads);
         printf("Tuples:        %zu\n", n_tuples);
-        printf(COLOR_YELLOW "\n-------------------------\n" COLOR_RESET);
-        printf("Time elapsed:  %ld ms\n", elapsed_time_ms);
-        printf(COLOR_YELLOW "-------------------------\n"   COLOR_RESET);
+        printf(COLOR_YELLOW "\n-----------------------------------\n" COLOR_RESET);
+        printf("Elapsed time:  %ld ms\n", elapsed_time_ms);
+        printf("Throughput:    %zu million tuples/s\n", throughput / 1000000);
+        printf(COLOR_YELLOW "-----------------------------------\n"   COLOR_RESET);
     }
 
     free(tuples);
