@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     size_t throughput = THROUGHPUT(n_tuples, elapsed_time_ms);
     if (result == EXIT_SUCCESS) {
         printf(COLOR_YELLOW "\n-----------------------------------\n" COLOR_RESET);
-        printf(COLOR_YELLOW "Benchmark Results:\n"          COLOR_RESET);
+        printf(COLOR_YELLOW "Benchmark Results:\n"                    COLOR_RESET);
         printf(COLOR_YELLOW "-----------------------------------\n"   COLOR_RESET);
         printf("Algorithm:     %s\n",  algorithm);
         printf("Hash bits:     %zu\n", n_hash_bits);
