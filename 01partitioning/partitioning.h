@@ -6,6 +6,11 @@
 #include <pthread.h>
 #include <string.h>
 #include <stdint.h>
+#include "colors.h"
+#include "hash.h"
+
+#define COMPUTE_PARTITIONS(hash_bit) (1 << hash_bit);
+#define THROUGHPUT(tuples, milliseconds) ((size_t)(tuples / ((milliseconds) / 1000.0)));
 
 typedef struct {
     uint64_t key;
@@ -13,6 +18,6 @@ typedef struct {
 } Tuple;
 
 int independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads);
-int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads);
+int concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads, pthread_t* threads);
 
 #endif // PARTITIONING_H
