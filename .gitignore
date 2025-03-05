@@ -219,4 +219,7 @@ partition
 # images
 *.png
 
+# Output files
+out
+
 # End of https://www.toptal.com/developers/gitignore/api/c,visualstudiocode,cmake,macos,vim,emacs,linux
