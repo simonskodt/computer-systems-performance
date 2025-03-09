@@ -1,5 +1,5 @@
-#include "hash.h"
-#include "partitioning.h"
+#include "../include/hash.h"
+#include "../include/partitioning.h"
 
 uint64_t mod_hashing(uint64_t key, size_t hash_bits) {
     // Partitions are calculated by 2^(hash_bits), example:

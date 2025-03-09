@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "partitioning.h"
-#include "colors.h"
+#include "../include/partitioning.h"
+#include "../include/colors.h"
 
 typedef struct {
     Tuple *tuples;

@@ -1,4 +1,4 @@
-#include "tuple_generator.h"
+#include "../include/tuple_generator.h"
 
 Tuple* setup_tuples(size_t n_tuples) {
     // Check for overflow of total byte allocation

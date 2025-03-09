@@ -1,4 +1,4 @@
-#include "partitioning.h"
+#include "../include/partitioning.h"
 #include <stdatomic.h>
 
 typedef struct {
