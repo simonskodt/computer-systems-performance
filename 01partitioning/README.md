@@ -17,23 +17,38 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
 
 ## How to Run
 
-- To compile project: `make`
-- To compile and run project: `./run.sh` with additional flags.
+- To compile the project: `make`
+- To compile and run the project: `.scripts/run.sh` with additional flags.
 
   Usage: `./partition <algorithm> <n_tuples> <n_hash_bits> <n_threads>`
   - `algorithm`:   'ind' for independent or 'con' for concurrent
   - `n_hash_bits`: number of hash bits to use
   - `n_threads`:   number of threads to use
-  - `n_tuples`:    number of tuples to partition (optional, default 2^(24)
+  - `n_tuples`:    number of tuples to partition (optional, default 2^(24))
+
+> [!IMPORTANT]  
+> **The `n_tuples` argument is optional. If not provided, it defaults to 2^(24).**
 
   Examples:
   ```sh
-  # Run independent partitioning
+  # Run independent partitioning from the project root
+  scripts/run.sh ind 8 4
+  # Run concurrent partitioning from the project root
+  scripts/run.sh con 8 4
+
+  # Run independent partitioning from the scripts folder
+  cd scripts
   ./run.sh ind 8 4
-  # Run concurrent partitioning
-  ./run.sh con 8 4
+  cd ..
+
+- To run the server script: `.scripts/run-server.sh`
+
+  Example:
+  ```sh
+  # Run the server script from the project root
+  scripts/run-server.sh
   ```
 
 ## Course Context
 
-This paper fits into the course of Computer Systems Performance, given that threads and shared resources were found to have a direct effect on overall performance. The choice of partitioning technique should therefore ideally have high performance, and the goal of this assignment is to design and run experiments that compare performance for two of these techniques.
+We examine how threads and shared resources impact computer system performance. Since partitioning techniques affect performance directly, we will test and compare two different approaches through targeted experiments.
