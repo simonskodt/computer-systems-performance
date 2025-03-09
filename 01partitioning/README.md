@@ -15,10 +15,13 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
 | Count-then-move | First counts elements, then moves them to final positions in two phases |
 | Parallel Buffers | Uses separate buffer spaces for each thread to avoid conflicts |
 
+> [!NOTE]  
+> We choose to implement the independent and the concurrent output.
+
 ## How to Run
 
 - To compile the project: `make`
-- To compile and run the project: `.scripts/run.sh` with additional flags.
+- To compile and run the project: `scripts/run.sh` with additional flags.
 
   Usage: `./partition <algorithm> <n_tuples> <n_hash_bits> <n_threads>`
   - `algorithm`:   'ind' for independent or 'con' for concurrent
@@ -26,8 +29,8 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
   - `n_threads`:   number of threads to use
   - `n_tuples`:    number of tuples to partition (optional, default 2^(24))
 
-> [!IMPORTANT]  
-> **The `n_tuples` argument is optional. If not provided, it defaults to 2^(24).**
+> [!TIP]  
+> The `n_tuples` argument is optional. If not provided, it defaults to 2^(24).
 
   Examples:
   ```sh
@@ -48,6 +51,9 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
   # Run the server script from the project root
   scripts/run-server.sh
   ```
+
+> [!WARNING]  
+> In the `run-server.sh` script, outcomment the perf command to obtain extra information on the running algorithm. 
 
 ## Course Context
 
