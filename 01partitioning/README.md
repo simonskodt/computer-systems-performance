@@ -15,7 +15,7 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
 | Count-then-move | First counts elements, then moves them to final positions in two phases |
 | Parallel Buffers | Uses separate buffer spaces for each thread to avoid conflicts |
 
-> [!NOTE]  
+> [!NOTE]
 > We choose to implement the independent and the concurrent output.
 
 ## How to Run
@@ -29,7 +29,7 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
   - `n_threads`:   number of threads to use
   - `n_tuples`:    number of tuples to partition (optional, default 2^(24))
 
-> [!TIP]  
+> [!TIP]
 > The `n_tuples` argument is optional. If not provided, it defaults to 2^(24).
 
   Examples:
@@ -52,7 +52,7 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
   scripts/run-server.sh
   ```
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > In the `run-server.sh` script, outcomment the perf command to obtain extra information on the running algorithm. 
 
 ## Course Context
