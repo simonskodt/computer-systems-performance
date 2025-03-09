@@ -1,6 +1,6 @@
-#include "partitioning.h"
-#include "colors.h"
-#include "tuple_generator.h"
+#include "../include/partitioning.h"
+#include "../include/colors.h"
+#include "../include/tuple_generator.h"
 
 // Function prototypes
 void local_bencemark_results(char *algorithm, size_t n_hash_bits, size_t n_threads, 

@@ -1,4 +1,4 @@
-#include "timer.h"
+#include "../include/timer.h"
 
 struct timespec start_timer(void) {
     struct timespec start_time;
