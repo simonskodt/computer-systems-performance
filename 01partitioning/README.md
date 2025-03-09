@@ -52,7 +52,7 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
   scripts/run-server.sh
   ```
 
-> [!WARNING]  
+> [!IMPORTANT]  
 > In the `run-server.sh` script, outcomment the perf command to obtain extra information on the running algorithm. 
 
 ## Course Context
