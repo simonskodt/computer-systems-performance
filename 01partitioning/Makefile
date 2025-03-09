@@ -2,8 +2,9 @@ CC := gcc
 CFLAGS := -Wall -Werror -O2
 LDFLAGS :=
 
-SRC_DIR := .
+SRC_DIR := src
 BUILD_DIR := build
+INCLUDE_DIR := include
 
 TARGET := partition
 SOURCES := $(wildcard $(SRC_DIR)/*.c)
