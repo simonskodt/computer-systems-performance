@@ -1,7 +1,14 @@
 #!/bin/bash
 
+# Get the directory of the current script
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+
+# Define the path
+BUILD_PARTITION="$SCRIPT_DIR/../build/partition"
+
 # Avoids same output when files have not changed
-make 2>&1 | grep -v "make: Nothing to be done for [\`']all[\`']."
+# -C points to the make file in case script is run inside /scrips folder
+make -C "$SCRIPT_DIR/.." 2>&1 | grep -v "make: Nothing to be done for [\`']all[\`']."
 
 # Check for the correct number of arguments
 if [ "$#" -ne 3 ] && [ "$#" -ne 4 ]; then
@@ -13,16 +20,16 @@ fi
 case "$1" in
     "ind"|"independent")
         if [ -n "$4" ]; then
-            ./build/partition independent "$2" "$3" "$4"
+            "$BUILD_PARTITION" independent "$2" "$3" "$4"
         else
-            ./build/partition independent "$2" "$3"
+            "$BUILD_PARTITION" independent "$2" "$3"
         fi
         ;;
     "con"|"concurrent")
         if [ -n "$4" ]; then
-            ./build/partition concurrent "$2" "$3" "$4"
+            "$BUILD_PARTITION" concurrent "$2" "$3" "$4"
         else
-            ./build/partition concurrent "$2" "$3"
+            "$BUILD_PARTITION" concurrent "$2" "$3"
         fi
         ;;
     *)
