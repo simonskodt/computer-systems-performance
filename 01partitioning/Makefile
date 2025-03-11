@@ -10,6 +10,10 @@ TARGET := partition
 SOURCES := $(wildcard $(SRC_DIR)/*.c)
 OBJECTS := $(SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
+ifdef AFFINITY
+CFLAGS += -DAFFINITY
+endif
+
 .DEFAULT_GOAL := all
 
 # Targets
