@@ -33,7 +33,12 @@ void* thread_func(void* arg) {
     return NULL;
 }
 
-long independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads) {
+long independent_output(
+    Tuple *tuples, 
+    size_t n_tuples, 
+    size_t n_hash_bits, 
+    size_t n_threads
+) {
     size_t num_partitions = 1UL << n_hash_bits;
 
     PartitionBuffer **thread_buffers = malloc(n_threads * sizeof(PartitionBuffer*));
@@ -63,6 +68,14 @@ long independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size
         }
     }
 
+    #ifdef AFFINITY
+        cpu_set_t cpuset[n_threads]; // = malloc(n_threads * sizeof(cpu_set_t));
+        const int thread_ids[32] = {
+            0, 16, 2, 18, 4, 20, 6, 22, 8, 24, 10, 26, 12, 28, 14, 30, // CORE 1
+            1, 17, 3, 19, 5, 21, 7, 23, 9, 25, 11, 27, 13, 29, 15, 31  // CORE 2
+        };
+    #endif
+
     pthread_t *threads = malloc(n_threads * sizeof(pthread_t));
     if (!threads) {
         perror("malloc failed for threads");
@@ -91,6 +104,13 @@ long independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size
         thread_data[t].num_partitions = num_partitions;
         thread_data[t].buffers = thread_buffers[t];
         start = thread_data[t].end_index;
+
+        #ifdef AFFINITY
+            int thread_id = thread_ids[i];
+            CPU_ZERO(&cpuset[i]);
+            CPU_SET(thread_id, &cpuset[i]);
+            pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+        #endif
     }
 
     for (size_t t = 0; t < n_threads; t++) {
