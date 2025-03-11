@@ -212,6 +212,7 @@ tags
 
 # Extras for this project
 partition
+settings.json
 
 # Python virtual environment
 /.venv/
