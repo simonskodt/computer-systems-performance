@@ -10,7 +10,7 @@ void print_usage();
 Tuple* setup_tuples(size_t n_tuples);
 
 int main(int argc, char *argv[]) {
-    if (argc != 3 && argc != 4) {
+    if (argc != 4 && argc != 5) {
         fprintf(stderr, "Error: Incorrect number of arguments\n");
         print_usage();
         return EXIT_FAILURE;
