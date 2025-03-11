@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 #include "../include/partitioning.h"
-#include "../include/colors.h"
 
 typedef struct {
     Tuple *tuples;
@@ -69,11 +65,7 @@ long independent_output(
     }
 
     #ifdef AFFINITY
-        cpu_set_t cpuset[n_threads]; // = malloc(n_threads * sizeof(cpu_set_t));
-        const int thread_ids[32] = {
-            0, 16, 2, 18, 4, 20, 6, 22, 8, 24, 10, 26, 12, 28, 14, 30, // CORE 1
-            1, 17, 3, 19, 5, 21, 7, 23, 9, 25, 11, 27, 13, 29, 15, 31  // CORE 2
-        };
+    cpu_set_t cpuset[n_threads];
     #endif
 
     pthread_t *threads = malloc(n_threads * sizeof(pthread_t));
@@ -106,10 +98,10 @@ long independent_output(
         start = thread_data[t].end_index;
 
         #ifdef AFFINITY
-            int thread_id = thread_ids[i];
-            CPU_ZERO(&cpuset[i]);
-            CPU_SET(thread_id, &cpuset[i]);
-            pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+        int thread_id = thread_ids[i];
+        CPU_ZERO(&cpuset[i]);
+        CPU_SET(thread_id, &cpuset[i]);
+        pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
         #endif
     }
 
