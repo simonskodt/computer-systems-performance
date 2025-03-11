@@ -13,7 +13,7 @@ make -C "$SCRIPT_DIR/.." 2>&1 | grep -v "make: Nothing to be done for [\`']all[\
 # Check for the correct number of arguments
 if [ "$#" -ne 3 ] && [ "$#" -ne 4 ]; then
     echo "Error: Incorrect number of arguments"
-    echo "Usage: $0 <algorithm> <n_hash_bits> <n_threads> [n_tuples]"
+    echo "Usage: $0 <algorithm> <n_hash_bits> <n_threads> [n_tuples] <affinity>"
     exit 1
 fi
 
