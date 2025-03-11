@@ -7,11 +7,12 @@
 #include <string.h>
 #include <stdint.h>
 #include <math.h>
+#include <sched.h>
 #include "colors.h"
 #include "hash.h"
 #include "timer.h"
 
-#define COMPUTE_PARTITIONS(hash_bit) (1 << hash_bit);
+#define COMPUTE_PARTITIONS(hash_bit) (1 << hash_bit)
 #define THROUGHPUT(tuples, milliseconds) ((size_t)(tuples / ((milliseconds) / 1000.0)));
 
 typedef struct {
