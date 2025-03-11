@@ -20,37 +20,54 @@ The four hash-based techniques that are mentioned in the paper are shown in the 
 
 ## How to Run
 
-- To compile the project: `make`
-- To compile and run the project: `scripts/run.sh` with additional flags.
+To compile the project: `make`
 
-  Usage: `./partition <algorithm> <n_tuples> <n_hash_bits> <n_threads>`
-  - `algorithm`:   'ind' for independent or 'con' for concurrent
-  - `n_hash_bits`: number of hash bits to use
-  - `n_threads`:   number of threads to use
-  - `n_tuples`:    number of tuples to partition (optional, default 2^(24))
+To compile and run the project: `scripts/run.sh` with additional flags (or use the `./partition` file).
+
+Usage: `./partition <algorithm> <n_tuples> <n_hash_bits> [n_threads]`
+- `algorithm`:   'ind' for independent or 'con' for concurrent
+- `n_hash_bits`: number of hash bits to use
+- `n_threads`:   number of threads to use
+- `n_tuples`:    number of tuples to partition (optional, default 2^(24))
 
 > [!TIP]
 > The `n_tuples` argument is optional. If not provided, it defaults to 2^(24).
 
-  Examples:
-  ```sh
-  # Run independent partitioning from the project root
-  scripts/run.sh ind 8 4
-  # Run concurrent partitioning from the project root
-  scripts/run.sh con 8 4
+Examples:
+```sh
+# From project root
+scripts/run.sh ind 8 4
+scripts/run.sh con 8 4
 
-  # Run independent partitioning from the scripts folder
-  cd scripts
-  ./run.sh ind 8 4
-  cd ..
+# From scripts folder
+cd scripts
+./run.sh ind 8 4
+cd ..
+```
 
-- To run the server script: `.scripts/run-server.sh`
+### Setting Affinity
 
-  Example:
-  ```sh
-  # Run the server script from the project root
-  scripts/run-server.sh
-  ```
+To compile and run the project with the affinity flag: scripts/run.sh -a or scripts/run.sh --affinity
+
+Usage: `./partition [-a|--affinity] <algorithm> <n_hash_bits> <n_threads>  [n_tuples]`
+
+`-a` or `--affinity`: optional flag to enable thread affinity
+
+Examples:
+```sh
+scripts/run.sh -a ind 8 4         # method 1
+scripts/run.sh --affinity con 8 4 # method 2
+```
+
+### Script: `run-server.sh`
+
+To run the server script: `.scripts/run-server.sh`. It generates a `/out` folder with many different runs for both the independent and concurrent output.
+
+Example:
+```sh
+# From the project root
+scripts/run-server.sh
+```
 
 > [!IMPORTANT]
 > In the `run-server.sh` script, outcomment the perf command to obtain extra information on the running algorithm. 
