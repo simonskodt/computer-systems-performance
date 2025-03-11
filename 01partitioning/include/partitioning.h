@@ -12,8 +12,19 @@
 #include "hash.h"
 #include "timer.h"
 
+#ifdef AFFINITY
+#include <sched.h>
+#endif
+
 #define COMPUTE_PARTITIONS(hash_bit) (1 << hash_bit)
 #define THROUGHPUT(tuples, milliseconds) ((size_t)(tuples / ((milliseconds) / 1000.0)));
+
+#ifdef AFFINITY
+const int thread_ids[32] = {
+    0, 16, 2, 18, 4, 20, 6, 22, 8, 24, 10, 26, 12, 28, 14, 30, // CORE 1
+    1, 17, 3, 19, 5, 21, 7, 23, 9, 25, 11, 27, 13, 29, 15, 31  // CORE 2
+};
+#endif
 
 typedef struct {
     uint64_t key;
