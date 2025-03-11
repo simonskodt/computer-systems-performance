@@ -1,10 +1,6 @@
 #include "../include/partitioning.h"
 #include <stdatomic.h>
 
-#ifdef AFFINITY
-#include <sched.h>
-#endif
-
 typedef struct {
     int thread_id;
     size_t start_index;
@@ -51,11 +47,7 @@ long concurrent_output(
     }
 
     #ifdef AFFINITY
-        cpu_set_t cpuset[n_threads]; // = malloc(n_threads * sizeof(cpu_set_t));
-        const int thread_ids[32] = {
-            0, 16, 2, 18, 4, 20, 6, 22, 8, 24, 10, 26, 12, 28, 14, 30, // CORE 1
-            1, 17, 3, 19, 5, 21, 7, 23, 9, 25, 11, 27, 13, 29, 15, 31  // CORE 2
-        };
+    cpu_set_t cpuset[n_threads];
     #endif
 
     for (int i = 0; i < n_partitions; i++) {
@@ -95,10 +87,10 @@ long concurrent_output(
         start = thread_args[i].end_index;
 
         #ifdef AFFINITY
-            int thread_id = thread_ids[i];
-            CPU_ZERO(&cpuset[i]);
-            CPU_SET(thread_id, &cpuset[i]);
-            pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+        int thread_id = thread_ids[i];
+        CPU_ZERO(&cpuset[i]);
+        CPU_SET(thread_id, &cpuset[i]);
+        pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
         #endif
     
         if (pthread_create(&threads[i], NULL, concurrent_thread_function, &thread_args[i]) != 0) {
