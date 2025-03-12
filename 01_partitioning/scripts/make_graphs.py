@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 import pprint
+import sys
 
 HASH_BIT_LEVELS = range(1, 19)
 THREAD_LEVELS = [2**n for n in range(6)]
@@ -41,8 +42,11 @@ def parse_output_files(directory):
     return results
 
 # Takes the results dictionary and graphs thorughput as a function of # of hash bits for each thread level of both algorithms
-def make_graphs(results):
+def make_graphs(results, dir):
     fig, axs = plt.subplots(1, 2, figsize=(12, 6))
+    # Set title of the whole plot to be name of directory
+    title = dir.split('/')[-1]
+    fig.suptitle(f'{title} Results')
 
     markers = ['o', 'x', 's', 'D', '^', 'v']
     # Plot for Independent Output Results
@@ -64,12 +68,31 @@ def make_graphs(results):
     axs[1].set_xticks(range(2, 19, 2))
 
     fig.tight_layout()
-    fig.savefig('./graphs.png')
+    fig.savefig(f'./results/{title}_graphs.png')
 
 def main():
-    results = parse_output_files('./out')
+    # Check that the correct number of arguments are passed
+    if len(sys.argv) != 2:
+        print('Usage: python make_graphs.py <directory>')
+        sys.exit()
+    
+    dir = sys.argv[1]
+    # Check that the directory exists
+    if os.path.isdir(dir) == False:
+        print(f'{dir} is not a directory')
+        sys.exit()
+    
+    # Check that file format in directory is correct using a regex on the first file
+    if not os.path.isfile(f'{dir}/ind_1hash_2thread.txt'):
+        print(f'Files in {dir} are not in the correct format: <algorithm>_<hash_bits>hash_<threads>thread.txt')
+        sys.exit()
+    
+    # Parse the output files
+    results = parse_output_files(dir)
     pprint.pp(results)
-    make_graphs(results)
+
+    # Make the graphs
+    make_graphs(results, dir)
 
 if __name__ == '__main__':
     main()
