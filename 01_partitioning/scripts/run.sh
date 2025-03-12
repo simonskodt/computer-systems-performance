@@ -23,13 +23,6 @@ if [ "${#ARGS[@]}" -lt 3 ] || [ "${#ARGS[@]}" -gt 4 ]; then
     exit 1
 fi
 
-# Run make with or without the AFFINITY flag
-if [ "$AFFINITY_FLAG" -eq 1 ]; then
-    make -C "$SCRIPT_DIR/.." AFFINITY=1 2>&1 | grep -v "make: Nothing to be done for [\`']all[\`']."
-else
-    make -C "$SCRIPT_DIR/.." 2>&1 | grep -v "make: Nothing to be done for [\`']all[\`']."
-fi
-
 # Check if the affinity flag is provided
 if [ "$#" -eq 5 ] && [ "$5" == "affinity" ]; then
     AFFINITY_FLAG=1
@@ -39,9 +32,9 @@ fi
 
 # Run make with or without the AFFINITY flag
 if [ "$AFFINITY_FLAG" -eq 1 ]; then
-    make -C "$SCRIPT_DIR/.." AFFINITY=1 2>&1 | grep -v "make: Nothing to be done for [\`']all[\`']."
+    make -C "$SCRIPT_DIR/.." --no-print-directory AFFINITY=1 2>&1 | grep -v "make: Nothing to be done for [\`']all[\`']."
 else
-    make -C "$SCRIPT_DIR/.." 2>&1 | grep -v "make: Nothing to be done for [\`']all[\`']."
+    make -C "$SCRIPT_DIR/.." --no-print-directory 2>&1 | grep -v "make: Nothing to be done for [\`']all[\`']."
 fi
 
 case "${ARGS[0]}" in
