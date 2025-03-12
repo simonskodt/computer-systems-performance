@@ -21,6 +21,8 @@ Tuple* setup_tuples(size_t n_tuples) {
         tuples[i].value = rand() % 1000;
     }
 
+    shuffle(tuples, n_tuples);
+
     return tuples;
 }
 
