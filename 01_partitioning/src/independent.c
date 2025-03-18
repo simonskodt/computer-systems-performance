@@ -29,11 +29,12 @@ void* thread_func(void* arg) {
     return NULL;
 }
 
-long independent_output(
+int independent_output(
     Tuple *tuples, 
     size_t n_tuples, 
     size_t n_hash_bits, 
-    size_t n_threads
+    size_t n_threads,
+    long *elapsed_time_ms
 ) {
     size_t num_partitions = 1UL << n_hash_bits;
 
@@ -51,7 +52,8 @@ long independent_output(
         thread_buffers[t] = malloc(num_partitions * sizeof(PartitionBuffer));
         if (!thread_buffers[t]) {
             perror("malloc failed for thread_buffers[t]");
-            return -1;
+            free(thread_buffers);
+            return EXIT_FAILURE;
         }
         for (size_t p = 0; p < num_partitions; p++) {
             thread_buffers[t][p].capacity = capacity;
@@ -59,7 +61,8 @@ long independent_output(
             thread_buffers[t][p].tuples = malloc(capacity * sizeof(Tuple));
             if (!thread_buffers[t][p].tuples) {
                 perror("malloc failed for partition buffer");
-                return -1;
+                free(thread_buffers);
+                return EXIT_FAILURE;
             }
         }
     }
@@ -71,12 +74,21 @@ long independent_output(
     pthread_t *threads = malloc(n_threads * sizeof(pthread_t));
     if (!threads) {
         perror("malloc failed for threads");
-        return -1;
+        free(thread_buffers);
+        return EXIT_FAILURE;
     }
     ThreadData *thread_data = malloc(n_threads * sizeof(ThreadData));
     if (!thread_data) {
         perror("malloc failed for thread_data");
-        return -1;
+        free(threads);
+        for (size_t t = 0; t < n_threads; t++) {
+            for (size_t p = 0; p < num_partitions; p++) {
+                free(thread_buffers[t][p].tuples);
+            }
+            free(thread_buffers[t]);
+        }
+        free(thread_buffers);
+        return EXIT_FAILURE;
     }
 
     // Start timer
@@ -109,7 +121,10 @@ long independent_output(
         int rc = pthread_create(&threads[t], NULL, thread_func, &thread_data[t]);
         if (rc != 0) {
             fprintf(stderr, "Error creating thread %zu\n", t);
-            return -1;
+            free(thread_data);
+            free(threads);
+            free(thread_buffers);
+            return EXIT_FAILURE;
         }
     }
 
@@ -118,17 +133,14 @@ long independent_output(
     }
 
     // End timer
-    long elapsed_time_ms = end_timer(start_time);
+    *elapsed_time_ms = end_timer(start_time);
 
     for (size_t t = 0; t < n_threads; t++) {
-        for (size_t p = 0; p < num_partitions; p++) {
-            free(thread_buffers[t][p].tuples);
-        }
         free(thread_buffers[t]);
     }
     free(thread_buffers);
     free(threads);
     free(thread_data);
 
-    return elapsed_time_ms;
+    return EXIT_SUCCESS;
 }

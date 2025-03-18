@@ -15,11 +15,12 @@ typedef struct {
 
 void* concurrent_thread_function(void* args);
 
-long concurrent_output(
+int concurrent_output(
     Tuple *tuples, 
     size_t n_tuples, 
     size_t n_hash_bits, 
-    size_t n_threads
+    size_t n_threads,
+    long *elapsed_time_ms
 ) {
     int n_partitions = COMPUTE_PARTITIONS(n_hash_bits);
     size_t tuples_per_partition = (n_tuples / n_partitions) * 1.5; // 50% larger than expected
@@ -34,6 +35,7 @@ long concurrent_output(
     ConcurrentThread* thread_args = malloc(n_threads * sizeof(ConcurrentThread));
     if (thread_args == NULL) {
         perror("Could not allocate memory for thread instances");
+        free(threads);
         return EXIT_FAILURE;
     }
 
@@ -43,6 +45,7 @@ long concurrent_output(
     if (partitions == NULL || partitions_sizes == NULL) {
         perror("Could not allocate memory for partitions");
         free(thread_args);
+        free(threads);
         return EXIT_FAILURE;
     }
 
@@ -63,6 +66,7 @@ long concurrent_output(
             free(partitions);
             free(partitions_sizes);
             free(thread_args);
+            free(threads);
             return EXIT_FAILURE;
         }
     }
@@ -96,6 +100,12 @@ long concurrent_output(
         if (pthread_create(&threads[i], NULL, concurrent_thread_function, &thread_args[i]) != 0) {
             perror("Could not create thread");
             free(thread_args);
+            free(threads);
+            for (int j = 0; j < n_partitions; j++) {
+                free(partitions[j]);
+            }
+            free(partitions);
+            free(partitions_sizes);
             return EXIT_FAILURE;
         }
     }
@@ -104,16 +114,8 @@ long concurrent_output(
         pthread_join(threads[i], NULL);
     }
 
-    // Printing the partitions and tuple keys
-    // for (size_t i = 0; i < n_partitions; i++) {
-    //     printf("Partition: %zu\n", i);
-    //     for (size_t j = 0; j < tuples_per_partition; j++) {
-    //         printf("Tuple: %llu\n", partitions[i][j].key);
-    //     }
-    // }
-
     // End timer
-    long elapsed_time_ms = end_timer(start_time);
+    *elapsed_time_ms = end_timer(start_time);
 
     // Free memory
     free(thread_args);
@@ -122,14 +124,13 @@ long concurrent_output(
     }
     free(partitions);
     free(partitions_sizes);
+    free(threads);
 
-    return elapsed_time_ms;
+    return EXIT_SUCCESS;
 }
 
 void* concurrent_thread_function(void* args) {
     ConcurrentThread* c_thread = (ConcurrentThread*) args;
-
-    // printf(COLOR_GREEN "Thread %d starting...\n" COLOR_RESET, c_thread->thread_id);
 
     for (size_t i = c_thread->start_index; i < c_thread->end_index; i++) {
         Tuple tuple = c_thread->tuples[i];
@@ -142,8 +143,6 @@ void* concurrent_thread_function(void* args) {
         size_t curr_partition_size = atomic_fetch_add(&c_thread->partition_sizes[partition_index], 1);
         c_thread->partitions[partition_index][curr_partition_size] = tuple;
     }
-
-    // printf(COLOR_RED "Thread %d stopping...\n" COLOR_RESET, c_thread->thread_id);
 
     return NULL;
 }
