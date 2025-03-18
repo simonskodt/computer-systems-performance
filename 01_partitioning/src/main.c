@@ -37,26 +37,31 @@ int main(int argc, char *argv[]) {
 
     // Match on selected algorithm
     long elapsed_time_ms;
+    int result;
     if (strcmp(algorithm, "independent") == 0) {
-        elapsed_time_ms = independent_output(tuples, n_tuples, n_hash_bits, n_threads);
+        result = independent_output(tuples, n_tuples, n_hash_bits, n_threads, &elapsed_time_ms);
     } else if (strcmp(algorithm, "concurrent") == 0) {
-        elapsed_time_ms = concurrent_output(tuples, n_tuples, n_hash_bits, n_threads);
+        result = concurrent_output(tuples, n_tuples, n_hash_bits, n_threads, &elapsed_time_ms);
     } else {
         fprintf(stderr, "Error: Unknown algorithm '%s'\n", algorithm);
         free(tuples);
         return EXIT_FAILURE;
     }
 
-    size_t throughput = THROUGHPUT(n_tuples, elapsed_time_ms);
-    // Rounds the throughput to the nearest million.
-    // For example: throughput is 1,499,999, it will be rounded to 1 million.
-    // If throughput is 1,500,000, it will be rounded to 2 million.
-    size_t throughput_millions = (throughput + 500000) / 1000000; 
-
-    server_benchmark_results(elapsed_time_ms, throughput_millions);
+    if (result == EXIT_SUCCESS) {
+        size_t throughput = THROUGHPUT(n_tuples, elapsed_time_ms);
+        // Rounds the throughput to the nearest million.
+        // For example: throughput is 1,499,999, it will be rounded to 1 million.
+        // If throughput is 1,500,000, it will be rounded to 2 million.
+        size_t throughput_millions = (throughput + 500000) / 1000000; 
+    
+        server_benchmark_results(elapsed_time_ms, throughput_millions);
+    } else {
+        fprintf(stderr, "Error: Partitioning algorithm failed\n");
+    }
 
     free(tuples);
-    return EXIT_SUCCESS;
+    return result;
 }
 
 void local_benchmark_results(char *algorithm, size_t n_hash_bits, size_t n_threads, 
