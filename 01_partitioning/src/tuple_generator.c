@@ -17,10 +17,10 @@ Tuple* setup_tuples(size_t n_tuples) {
 
     // Generate key value pair
     for (uint64_t i = 0; i < n_tuples; i++) {
-        tuples[i].key = i; // might need different distribution (shuffle) later on
+        tuples[i].key = i;
         tuples[i].value = rand() % 1000;
     }
-
+    
     shuffle(tuples, n_tuples);
 
     return tuples;
