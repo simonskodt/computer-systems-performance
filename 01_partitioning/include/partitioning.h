@@ -31,7 +31,18 @@ typedef struct {
     uint64_t value;
 } Tuple;
 
-long independent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads);
-long concurrent_output(Tuple *tuples, size_t n_tuples, size_t n_hash_bits, size_t n_threads);
+int independent_output(
+    Tuple *tuples, 
+    size_t n_tuples, 
+    size_t n_hash_bits, 
+    size_t n_threads,
+    long *elapsed_time_ms); 
+int concurrent_output(
+    Tuple *tuples, 
+    size_t n_tuples, 
+    size_t n_hash_bits, 
+    size_t n_threads,
+    long *elapsed_time_ms
+);
 
 #endif // PARTITIONING_H
