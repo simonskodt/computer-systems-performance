@@ -18,11 +18,11 @@ for hash in "${hash_bits[@]}"; do
         for ((i=0; i<NUM_ITERATIONS; i++)); do
             # Independent output
             "$RUN_SCRIPT" ind $hash $thread >> "${OUTPUT_DIR}/ind_${hash}hash_${thread}thread.txt"
-            # perf stat -e cycles,instructions,cache-references,cache-misses "$RUN_SCRIPT" ind $hash $thread 2>> "${OUTPUT_DIR}/ind_${hash}hash_${thread}thread_perf.txt"
+            perf stat -e cycles,instructions,cache-references,cache-misses "$RUN_SCRIPT" ind $hash $thread 2>> "${OUTPUT_DIR}/ind_${hash}hash_${thread}thread_perf.txt"
 
             # Concurrent output
             "$RUN_SCRIPT" con $hash $thread >> "${OUTPUT_DIR}/con_${hash}hash_${thread}thread.txt"
-            # perf stat -e cycles,instructions,cache-references,cache-misses "$RUN_SCRIPT" con $hash $thread 2>> "${OUTPUT_DIR}/con_${hash}hash_${thread}thread_perf.txt"
+            perf stat -e cycles,instructions,cache-references,cache-misses "$RUN_SCRIPT" con $hash $thread 2>> "${OUTPUT_DIR}/con_${hash}hash_${thread}thread_perf.txt"
         done
     done
 done
