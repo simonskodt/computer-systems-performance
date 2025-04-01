@@ -1,4 +1,4 @@
-# Computer Systems Performance: Partitiong Algorithms
+# Partitiong Algorithms
 
 The task in this assignment is to reproduce two of the four partitioning algorithms described in the paper titled "Data Partitioning on Chip Multiprocessors." The purpose of the paper is to outline some partitioning strategies that are used in databases to parallelize computation in chip multiprocessors (CMPs).
 
