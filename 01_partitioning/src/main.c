@@ -32,7 +32,6 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    // Setup tuples and threads
     Tuple* tuples = setup_tuples(n_tuples);
 
     // Match on selected algorithm

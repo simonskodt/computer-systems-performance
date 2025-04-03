@@ -221,7 +221,6 @@ settings.json
 *.png
 
 # Output files
-out
 
 # Results
 results

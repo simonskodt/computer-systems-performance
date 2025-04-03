@@ -1,8 +1,4 @@
 #include "../include/partitioning.h"
-#include <math.h>
-#include <pthread.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 typedef struct {
     Tuple *tuples;
@@ -27,11 +23,8 @@ void* thread_func(void* arg) {
         Tuple a = data->tuples[i];
         unsigned long long partition = COMPUTE_HASH_MOD(a.key, data->num_partitions);
         PartitionBuffer *buf = &data->buffers[partition];
-        if (buf->count < buf->capacity) {
-            buf->tuples[buf->count++] = a;
-        } else {
-            fprintf(stderr, "[Thread %zu] Partition %llu overflow\n", data->tid, partition);
-        }
+        buf->tuples[buf->count] = a;
+        buf->count++;
     }
     return NULL;
 }
@@ -48,40 +41,49 @@ int independent_output(
     PartitionBuffer **thread_buffers = malloc(n_threads * sizeof(PartitionBuffer*));
     if (!thread_buffers) {
         perror("malloc failed for thread_buffers");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     double expected = ((double)(n_tuples / n_threads)) / num_partitions;
-    size_t capacity = (size_t)ceil(expected * 3 + 64);
+    // Is 10% enough, paper uses 50% ??
+    size_t capacity = (size_t)ceil(expected * 1.1);
 
-    size_t threads_allocated = 0;
-    for (; threads_allocated < n_threads; threads_allocated++) {
-        thread_buffers[threads_allocated] = malloc(num_partitions * sizeof(PartitionBuffer));
-        if (!thread_buffers[threads_allocated]) {
+    for (size_t t = 0; t < n_threads; t++) {
+        thread_buffers[t] = malloc(num_partitions * sizeof(PartitionBuffer));
+        if (!thread_buffers[t]) {
             perror("malloc failed for thread_buffers[t]");
-            break;
+            free(thread_buffers);
+            return EXIT_FAILURE;
         }
         for (size_t p = 0; p < num_partitions; p++) {
-            thread_buffers[threads_allocated][p].capacity = capacity;
-            thread_buffers[threads_allocated][p].count = 0;
-            thread_buffers[threads_allocated][p].tuples = malloc(capacity * sizeof(Tuple));
-            if (!thread_buffers[threads_allocated][p].tuples) {
+            thread_buffers[t][p].capacity = capacity;
+            thread_buffers[t][p].count = 0;
+            thread_buffers[t][p].tuples = malloc(capacity * sizeof(Tuple));
+            if (!thread_buffers[t][p].tuples) {
                 perror("malloc failed for partition buffer");
-                for (size_t j = 0; j <= p; j++) {
-                    if (thread_buffers[threads_allocated][j].tuples)
-                        free(thread_buffers[threads_allocated][j].tuples);
-                }
-                free(thread_buffers[threads_allocated]);
-                break;
+                free(thread_buffers);
+                return EXIT_FAILURE;
             }
         }
     }
 
-    if (threads_allocated != n_threads) {
-        for (size_t t = 0; t < threads_allocated; t++) {
+    #ifdef AFFINITY
+    cpu_set_t cpuset[n_threads];
+    #endif
+
+    pthread_t *threads = malloc(n_threads * sizeof(pthread_t));
+    if (!threads) {
+        perror("malloc failed for threads");
+        free(thread_buffers);
+        return EXIT_FAILURE;
+    }
+    ThreadData *thread_data = malloc(n_threads * sizeof(ThreadData));
+    if (!thread_data) {
+        perror("malloc failed for thread_data");
+        free(threads);
+        for (size_t t = 0; t < n_threads; t++) {
             for (size_t p = 0; p < num_partitions; p++) {
-                if (thread_buffers[t][p].tuples)
-                    free(thread_buffers[t][p].tuples);
+                free(thread_buffers[t][p].tuples);
             }
             free(thread_buffers[t]);
         }
@@ -89,18 +91,7 @@ int independent_output(
         return EXIT_FAILURE;
     }
 
-    pthread_t *threads = malloc(n_threads * sizeof(pthread_t));
-    if (!threads) {
-        perror("malloc failed for threads");
-        goto cleanup;
-    }
-    ThreadData *thread_data = malloc(n_threads * sizeof(ThreadData));
-    if (!thread_data) {
-        perror("malloc failed for thread_data");
-        free(threads);
-        goto cleanup;
-    }
-
+    // Start timer
     struct timespec start_time = start_timer();
 
     size_t tuples_per_thread = n_tuples / n_threads;
@@ -117,14 +108,23 @@ int independent_output(
         thread_data[t].num_partitions = num_partitions;
         thread_data[t].buffers = thread_buffers[t];
         start = thread_data[t].end_index;
+
+        #ifdef AFFINITY
+        int thread_id = thread_ids[i];
+        CPU_ZERO(&cpuset[i]);
+        CPU_SET(thread_id, &cpuset[i]);
+        pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+        #endif
     }
 
     for (size_t t = 0; t < n_threads; t++) {
-        if (pthread_create(&threads[t], NULL, thread_func, &thread_data[t]) != 0) {
+        int rc = pthread_create(&threads[t], NULL, thread_func, &thread_data[t]);
+        if (rc != 0) {
             fprintf(stderr, "Error creating thread %zu\n", t);
             free(thread_data);
             free(threads);
-            goto cleanup;
+            free(thread_buffers);
+            return EXIT_FAILURE;
         }
     }
 
@@ -132,20 +132,15 @@ int independent_output(
         pthread_join(threads[t], NULL);
     }
 
+    // End timer
     *elapsed_time_ms = end_timer(start_time);
 
-    free(thread_data);
-    free(threads);
-
-cleanup:
     for (size_t t = 0; t < n_threads; t++) {
-        for (size_t p = 0; p < num_partitions; p++) {
-            if (thread_buffers[t] && thread_buffers[t][p].tuples)
-                free(thread_buffers[t][p].tuples);
-        }
         free(thread_buffers[t]);
     }
     free(thread_buffers);
+    free(threads);
+    free(thread_data);
 
     return EXIT_SUCCESS;
 }
