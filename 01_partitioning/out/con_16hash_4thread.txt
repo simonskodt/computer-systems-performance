@@ -1,0 +1,160 @@
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+/root/computer-systems-performance/01_partitioning/scripts/run.sh: line 37: make: command not found
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+make: gcc: No such file or directory
+make: *** [Makefile:28: build/concurrent.o] Error 127
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+make: gcc: No such file or directory
+make: *** [Makefile:28: build/concurrent.o] Error 127
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+make: gcc: No such file or directory
+make: *** [Makefile:28: build/concurrent.o] Error 127
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+make: gcc: No such file or directory
+make: *** [Makefile:28: build/concurrent.o] Error 127
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+make: gcc: No such file or directory
+make: *** [Makefile:28: build/concurrent.o] Error 127
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+make: gcc: No such file or directory
+make: *** [Makefile:28: build/concurrent.o] Error 127
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+make: gcc: No such file or directory
+make: *** [Makefile:28: build/concurrent.o] Error 127
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+make: gcc: No such file or directory
+make: *** [Makefile:28: build/concurrent.o] Error 127
+Elapsed time: 163 ms
+Throughput: 103 million tuples/s
+-----------------------------------
+Elapsed time: 165 ms
+Throughput: 102 million tuples/s
+-----------------------------------
+Elapsed time: 179 ms
+Throughput: 94 million tuples/s
+-----------------------------------
+Elapsed time: 163 ms
+Throughput: 103 million tuples/s
+-----------------------------------
+Elapsed time: 161 ms
+Throughput: 104 million tuples/s
+-----------------------------------
+Elapsed time: 162 ms
+Throughput: 104 million tuples/s
+-----------------------------------
+Elapsed time: 161 ms
+Throughput: 104 million tuples/s
+-----------------------------------
+Elapsed time: 162 ms
+Throughput: 104 million tuples/s
+-----------------------------------
+Elapsed time: 164 ms
+Throughput: 102 million tuples/s
+-----------------------------------
+Elapsed time: 169 ms
+Throughput: 99 million tuples/s
+-----------------------------------
+Elapsed time: 163 ms
+Throughput: 103 million tuples/s
+-----------------------------------
+Elapsed time: 159 ms
+Throughput: 106 million tuples/s
+-----------------------------------
+Elapsed time: 162 ms
+Throughput: 104 million tuples/s
+-----------------------------------
+Elapsed time: 165 ms
+Throughput: 102 million tuples/s
+-----------------------------------
+Elapsed time: 163 ms
+Throughput: 103 million tuples/s
+-----------------------------------
+Elapsed time: 161 ms
+Throughput: 104 million tuples/s
+-----------------------------------
+Elapsed time: 199 ms
+Throughput: 84 million tuples/s
+-----------------------------------
+Elapsed time: 200 ms
+Throughput: 84 million tuples/s
+-----------------------------------
+Elapsed time: 198 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 199 ms
+Throughput: 84 million tuples/s
+-----------------------------------
+Elapsed time: 198 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 199 ms
+Throughput: 84 million tuples/s
+-----------------------------------
+Elapsed time: 198 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 198 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 197 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 199 ms
+Throughput: 84 million tuples/s
+-----------------------------------
+Elapsed time: 202 ms
+Throughput: 83 million tuples/s
+-----------------------------------
+Elapsed time: 198 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 197 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 197 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 199 ms
+Throughput: 84 million tuples/s
+-----------------------------------
+Elapsed time: 197 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 200 ms
+Throughput: 84 million tuples/s
+-----------------------------------
+Elapsed time: 199 ms
+Throughput: 84 million tuples/s
+-----------------------------------
+Elapsed time: 198 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 201 ms
+Throughput: 83 million tuples/s
+-----------------------------------
+Elapsed time: 198 ms
+Throughput: 85 million tuples/s
+-----------------------------------
+Elapsed time: 200 ms
+Throughput: 84 million tuples/s
+-----------------------------------
+Elapsed time: 200 ms
+Throughput: 84 million tuples/s
+-----------------------------------
+Elapsed time: 196 ms
+Throughput: 86 million tuples/s
+-----------------------------------
