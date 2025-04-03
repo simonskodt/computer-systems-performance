@@ -206,3 +206,27 @@ Throughput: 52 million tuples/s
 Elapsed time: 319 ms
 Throughput: 53 million tuples/s
 -----------------------------------
+Elapsed time: 331 ms
+Throughput: 51 million tuples/s
+-----------------------------------
+Elapsed time: 332 ms
+Throughput: 51 million tuples/s
+-----------------------------------
+Elapsed time: 339 ms
+Throughput: 49 million tuples/s
+-----------------------------------
+Elapsed time: 330 ms
+Throughput: 51 million tuples/s
+-----------------------------------
+Elapsed time: 317 ms
+Throughput: 53 million tuples/s
+-----------------------------------
+Elapsed time: 322 ms
+Throughput: 52 million tuples/s
+-----------------------------------
+Elapsed time: 331 ms
+Throughput: 51 million tuples/s
+-----------------------------------
+Elapsed time: 321 ms
+Throughput: 52 million tuples/s
+-----------------------------------

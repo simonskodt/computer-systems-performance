@@ -206,3 +206,27 @@ Throughput: 86 million tuples/s
 Elapsed time: 195 ms
 Throughput: 86 million tuples/s
 -----------------------------------
+Elapsed time: 195 ms
+Throughput: 86 million tuples/s
+-----------------------------------
+Elapsed time: 193 ms
+Throughput: 87 million tuples/s
+-----------------------------------
+Elapsed time: 195 ms
+Throughput: 86 million tuples/s
+-----------------------------------
+Elapsed time: 190 ms
+Throughput: 88 million tuples/s
+-----------------------------------
+Elapsed time: 189 ms
+Throughput: 89 million tuples/s
+-----------------------------------
+Elapsed time: 190 ms
+Throughput: 88 million tuples/s
+-----------------------------------
+Elapsed time: 189 ms
+Throughput: 89 million tuples/s
+-----------------------------------
+Elapsed time: 190 ms
+Throughput: 88 million tuples/s
+-----------------------------------
