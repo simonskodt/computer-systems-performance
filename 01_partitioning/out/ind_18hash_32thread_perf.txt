@@ -54,3 +54,11 @@ scripts/run-server.sh: line 21: perf: command not found
 scripts/run-server.sh: line 21: perf: command not found
 scripts/run-server.sh: line 21: perf: command not found
 scripts/run-server.sh: line 21: perf: command not found
+scripts/run-server.sh: line 21: perf: command not found
+scripts/run-server.sh: line 21: perf: command not found
+scripts/run-server.sh: line 21: perf: command not found
+scripts/run-server.sh: line 21: perf: command not found
+scripts/run-server.sh: line 21: perf: command not found
+scripts/run-server.sh: line 21: perf: command not found
+scripts/run-server.sh: line 21: perf: command not found
+scripts/run-server.sh: line 21: perf: command not found
