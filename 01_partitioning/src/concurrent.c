@@ -49,9 +49,7 @@ int concurrent_output(
         return EXIT_FAILURE;
     }
 
-    #ifdef AFFINITY
     cpu_set_t cpuset[n_threads];
-    #endif
 
     for (int i = 0; i < n_partitions; i++) {
         partitions[i] = malloc(tuples_per_partition * sizeof(Tuple));
@@ -90,12 +88,10 @@ int concurrent_output(
         thread_args[i].partition_sizes = partitions_sizes;
         start = thread_args[i].end_index;
 
-        #ifdef AFFINITY
         int thread_id = thread_ids[i];
         CPU_ZERO(&cpuset[i]);
         CPU_SET(thread_id, &cpuset[i]);
         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
-        #endif
     
         if (pthread_create(&threads[i], NULL, concurrent_thread_function, &thread_args[i]) != 0) {
             perror("Could not create thread");

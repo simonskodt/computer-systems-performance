@@ -89,6 +89,8 @@ int independent_output(
         return EXIT_FAILURE;
     }
 
+    cpu_set_t cpuset[n_threads];
+
     pthread_t *threads = malloc(n_threads * sizeof(pthread_t));
     if (!threads) {
         perror("malloc failed for threads");
@@ -117,6 +119,11 @@ int independent_output(
         thread_data[t].num_partitions = num_partitions;
         thread_data[t].buffers = thread_buffers[t];
         start = thread_data[t].end_index;
+        
+        int thread_id = thread_ids[i];
+        CPU_ZERO(&cpuset[i]);
+        CPU_SET(thread_id, &cpuset[i]);
+        pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
     }
 
     for (size_t t = 0; t < n_threads; t++) {

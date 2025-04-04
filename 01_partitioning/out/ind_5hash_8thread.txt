@@ -230,3 +230,163 @@ Throughput: 294 million tuples/s
 Elapsed time: 49 ms
 Throughput: 342 million tuples/s
 -----------------------------------
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+src/concurrent.c: In function ‘concurrent_output’:
+src/concurrent.c:92:9: error: implicit declaration of function ‘CPU_ZERO’; did you mean ‘FP_ZERO’? [-Wimplicit-function-declaration]
+   92 |         CPU_ZERO(&cpuset[i]);
+      |         ^~~~~~~~
+      |         FP_ZERO
+src/concurrent.c:93:9: error: implicit declaration of function ‘CPU_SET’ [-Wimplicit-function-declaration]
+   93 |         CPU_SET(thread_id, &cpuset[i]);
+      |         ^~~~~~~
+src/concurrent.c:94:9: error: implicit declaration of function ‘pthread_attr_setaffinity_np’ [-Wimplicit-function-declaration]
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/concurrent.c:94:38: error: ‘attr’ undeclared (first use in this function)
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |                                      ^~~~
+src/concurrent.c:94:38: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Makefile:28: build/concurrent.o] Error 1
+Elapsed time: 49 ms
+Throughput: 342 million tuples/s
+-----------------------------------
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+src/concurrent.c: In function ‘concurrent_output’:
+src/concurrent.c:92:9: error: implicit declaration of function ‘CPU_ZERO’; did you mean ‘FP_ZERO’? [-Wimplicit-function-declaration]
+   92 |         CPU_ZERO(&cpuset[i]);
+      |         ^~~~~~~~
+      |         FP_ZERO
+src/concurrent.c:93:9: error: implicit declaration of function ‘CPU_SET’ [-Wimplicit-function-declaration]
+   93 |         CPU_SET(thread_id, &cpuset[i]);
+      |         ^~~~~~~
+src/concurrent.c:94:9: error: implicit declaration of function ‘pthread_attr_setaffinity_np’ [-Wimplicit-function-declaration]
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/concurrent.c:94:38: error: ‘attr’ undeclared (first use in this function)
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |                                      ^~~~
+src/concurrent.c:94:38: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Makefile:28: build/concurrent.o] Error 1
+Elapsed time: 52 ms
+Throughput: 323 million tuples/s
+-----------------------------------
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+src/concurrent.c: In function ‘concurrent_output’:
+src/concurrent.c:92:9: error: implicit declaration of function ‘CPU_ZERO’; did you mean ‘FP_ZERO’? [-Wimplicit-function-declaration]
+   92 |         CPU_ZERO(&cpuset[i]);
+      |         ^~~~~~~~
+      |         FP_ZERO
+src/concurrent.c:93:9: error: implicit declaration of function ‘CPU_SET’ [-Wimplicit-function-declaration]
+   93 |         CPU_SET(thread_id, &cpuset[i]);
+      |         ^~~~~~~
+src/concurrent.c:94:9: error: implicit declaration of function ‘pthread_attr_setaffinity_np’ [-Wimplicit-function-declaration]
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/concurrent.c:94:38: error: ‘attr’ undeclared (first use in this function)
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |                                      ^~~~
+src/concurrent.c:94:38: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Makefile:28: build/concurrent.o] Error 1
+Elapsed time: 48 ms
+Throughput: 350 million tuples/s
+-----------------------------------
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+src/concurrent.c: In function ‘concurrent_output’:
+src/concurrent.c:92:9: error: implicit declaration of function ‘CPU_ZERO’; did you mean ‘FP_ZERO’? [-Wimplicit-function-declaration]
+   92 |         CPU_ZERO(&cpuset[i]);
+      |         ^~~~~~~~
+      |         FP_ZERO
+src/concurrent.c:93:9: error: implicit declaration of function ‘CPU_SET’ [-Wimplicit-function-declaration]
+   93 |         CPU_SET(thread_id, &cpuset[i]);
+      |         ^~~~~~~
+src/concurrent.c:94:9: error: implicit declaration of function ‘pthread_attr_setaffinity_np’ [-Wimplicit-function-declaration]
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/concurrent.c:94:38: error: ‘attr’ undeclared (first use in this function)
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |                                      ^~~~
+src/concurrent.c:94:38: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Makefile:28: build/concurrent.o] Error 1
+Elapsed time: 65 ms
+Throughput: 258 million tuples/s
+-----------------------------------
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+src/concurrent.c: In function ‘concurrent_output’:
+src/concurrent.c:92:9: error: implicit declaration of function ‘CPU_ZERO’; did you mean ‘FP_ZERO’? [-Wimplicit-function-declaration]
+   92 |         CPU_ZERO(&cpuset[i]);
+      |         ^~~~~~~~
+      |         FP_ZERO
+src/concurrent.c:93:9: error: implicit declaration of function ‘CPU_SET’ [-Wimplicit-function-declaration]
+   93 |         CPU_SET(thread_id, &cpuset[i]);
+      |         ^~~~~~~
+src/concurrent.c:94:9: error: implicit declaration of function ‘pthread_attr_setaffinity_np’ [-Wimplicit-function-declaration]
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/concurrent.c:94:38: error: ‘attr’ undeclared (first use in this function)
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |                                      ^~~~
+src/concurrent.c:94:38: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Makefile:28: build/concurrent.o] Error 1
+Elapsed time: 53 ms
+Throughput: 317 million tuples/s
+-----------------------------------
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+src/concurrent.c: In function ‘concurrent_output’:
+src/concurrent.c:92:9: error: implicit declaration of function ‘CPU_ZERO’; did you mean ‘FP_ZERO’? [-Wimplicit-function-declaration]
+   92 |         CPU_ZERO(&cpuset[i]);
+      |         ^~~~~~~~
+      |         FP_ZERO
+src/concurrent.c:93:9: error: implicit declaration of function ‘CPU_SET’ [-Wimplicit-function-declaration]
+   93 |         CPU_SET(thread_id, &cpuset[i]);
+      |         ^~~~~~~
+src/concurrent.c:94:9: error: implicit declaration of function ‘pthread_attr_setaffinity_np’ [-Wimplicit-function-declaration]
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/concurrent.c:94:38: error: ‘attr’ undeclared (first use in this function)
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |                                      ^~~~
+src/concurrent.c:94:38: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Makefile:28: build/concurrent.o] Error 1
+Elapsed time: 58 ms
+Throughput: 289 million tuples/s
+-----------------------------------
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+src/concurrent.c: In function ‘concurrent_output’:
+src/concurrent.c:92:9: error: implicit declaration of function ‘CPU_ZERO’; did you mean ‘FP_ZERO’? [-Wimplicit-function-declaration]
+   92 |         CPU_ZERO(&cpuset[i]);
+      |         ^~~~~~~~
+      |         FP_ZERO
+src/concurrent.c:93:9: error: implicit declaration of function ‘CPU_SET’ [-Wimplicit-function-declaration]
+   93 |         CPU_SET(thread_id, &cpuset[i]);
+      |         ^~~~~~~
+src/concurrent.c:94:9: error: implicit declaration of function ‘pthread_attr_setaffinity_np’ [-Wimplicit-function-declaration]
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/concurrent.c:94:38: error: ‘attr’ undeclared (first use in this function)
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |                                      ^~~~
+src/concurrent.c:94:38: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Makefile:28: build/concurrent.o] Error 1
+Elapsed time: 50 ms
+Throughput: 336 million tuples/s
+-----------------------------------
+gcc -Wall -Werror -O2 -c src/concurrent.c -o build/concurrent.o
+src/concurrent.c: In function ‘concurrent_output’:
+src/concurrent.c:92:9: error: implicit declaration of function ‘CPU_ZERO’; did you mean ‘FP_ZERO’? [-Wimplicit-function-declaration]
+   92 |         CPU_ZERO(&cpuset[i]);
+      |         ^~~~~~~~
+      |         FP_ZERO
+src/concurrent.c:93:9: error: implicit declaration of function ‘CPU_SET’ [-Wimplicit-function-declaration]
+   93 |         CPU_SET(thread_id, &cpuset[i]);
+      |         ^~~~~~~
+src/concurrent.c:94:9: error: implicit declaration of function ‘pthread_attr_setaffinity_np’ [-Wimplicit-function-declaration]
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/concurrent.c:94:38: error: ‘attr’ undeclared (first use in this function)
+   94 |         pthread_attr_setaffinity_np(&attr[i], sizeof(cpu_set_t), &cpuset[i]);
+      |                                      ^~~~
+src/concurrent.c:94:38: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Makefile:28: build/concurrent.o] Error 1
+Elapsed time: 49 ms
+Throughput: 342 million tuples/s
+-----------------------------------
