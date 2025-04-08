@@ -45,8 +45,8 @@ int independent_output(
     }
 
     double expected = ((double)(n_tuples / n_threads)) / num_partitions;
-    // Is 10% enough, paper uses 50% ??
-    size_t capacity = (size_t)ceil(expected * 1.1);
+    // 50% is not enough with shuffling (bad hashing?)
+    size_t capacity = (size_t)ceil(expected * 3 + 64);
 
     for (size_t t = 0; t < n_threads; t++) {
         thread_buffers[t] = malloc(num_partitions * sizeof(PartitionBuffer));
