@@ -1,29 +1,47 @@
 # Comparing Joins in DuckDB and SQLite Databases
 
+## A Bit About This Project
 
+This project examines the performance of join operations between DuckDB and SQLite databases. The focus lies on comparing their performance in *OLTP (Online Transaction Processing)* and *OLAP (Online Analytical Processing)* workloads; the comparison utilises queries from the TPC-H benchmark — a standard for evaluating database performance.
 
+## OLTP and OLAP
 
-## How to Run with Make
+| **OLTP**                          | **OLAP**                          |
+|-----------------------------------|-----------------------------------|
+| Designed for transactional tasks. | Designed for analytical tasks.    |
+| Handles a large number of short online transactions (e.g., INSERT, UPDATE). | Handles complex queries for data analysis. |
+| Prioritizes speed and reliability. | Prioritizes query performance and insights. |
+| Example: Banking systems.         | Example: Business intelligence.  |
 
-Build the Project: `make`
+## What is TPC-H?
 
-Run the Program: `make run ARGS="your_arguments_here"`
+To-do ...
 
-Clean the Build: `make clean`
+## Benchmarking Script and Query Files
 
-### CMake
+| **File**            | **Description**                                                                      |
+|---------------------|--------------------------------------------------------------------------------------|
+| `db_benchmark.py`   | Python script to benchmark query execution times in DuckDB and SQLite databases.     |
+| `sql_benchmarks/`   | Contains SQL files for setting up the database schema and running benchmark queries. |
 
-...
+## Installation
 
-### DuckDB
+Ensure you have the required dependencies installed. Run the following command:
 
-There are multiple ways of including the duckdb header file. 
+```bash
+pip install -r requirements.txt
+```
 
-1. One way is by installing the duckdb database using brew or winget, and then point to the path of the include folder using .vscode/c_cpp_properties.json file. 
-2. The other way is installing the correct asset from the duckdb repository, and then manually copy the header file into the include folder in this repository. Find the assert here: https://github.com/duckdb/duckdb/releases/tag/v1.2.1.
+## How to Run
 
-Copy command: `gcc -o duckdb src/duckdb.c -I/opt/homebrew/Cellar/duckdb/1.2.1/include -L/opt/homebrew/Cellar/duckdb/1.2.1/lib -lduckdb`
+To-do ...
 
-### SQLite
+## Results
 
+The results demonstrate the execution time of queries in both DuckDB and SQLite; this comparison illustrates their performance characteristics in OLTP and OLAP contexts.
 
+To-do ...
+
+## Conclusion
+
+To-do ...
