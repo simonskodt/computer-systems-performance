@@ -71,6 +71,33 @@ def benchmark_query(db, query):
 
     return results, column_names, column_types, execution_time
 
+def benchmark_sqlite(sqlite_db, query):
+    """Benchmark and print results for SQLite."""
+    print(f"{Colors.OKBLUE}--- SQLite Benchmark ---{Colors.ENDC}")
+    sqlite_results, sqlite_columns, sqlite_types, sqlite_time = benchmark_query(sqlite_db, query)
+    if sqlite_results:
+        # Add column names and types as a header
+        headers = [f"{col}\n{typ}" for col, typ in zip(sqlite_columns, sqlite_types)]
+        print(f"{Colors.OKBLUE}SQLite Results:{Colors.ENDC}")
+        print(tabulate(sqlite_results, headers=headers, tablefmt="fancy_grid"))
+    else:
+        print(f"{Colors.OKBLUE}SQLite Results:{Colors.ENDC} No results")
+    print(f"{Colors.OKCYAN}SQLite Time:{Colors.ENDC} {sqlite_time:.6f} seconds\n")
+
+
+def benchmark_duckdb(duckdb_db, query):
+    """Benchmark and print results for DuckDB."""
+    print(f"{Colors.OKGREEN}--- DuckDB Benchmark ---{Colors.ENDC}")
+    duckdb_results, duckdb_columns, duckdb_types, duckdb_time = benchmark_query(duckdb_db, query)
+    if duckdb_results:
+        # Add column names and types as a header
+        headers = [f"{col}\n{typ}" for col, typ in zip(duckdb_columns, duckdb_types)]
+        print(f"{Colors.OKGREEN}DuckDB Results:{Colors.ENDC}")
+        print(tabulate(duckdb_results, headers=headers, tablefmt="fancy_grid"))
+    else:
+        print(f"{Colors.OKGREEN}DuckDB Results:{Colors.ENDC} No results")
+    print(f"{Colors.OKCYAN}DuckDB Time:{Colors.ENDC} {duckdb_time:.6f} seconds\n")
+
 def main():
     sqlite_db = SQLite('sqlite.db')
     duckdb_db = DuckDB('duckdb.db')
@@ -92,28 +119,10 @@ def main():
             print(f"{Colors.HEADER}{'=' * 60}{Colors.ENDC}\n")
 
             # Benchmark SQLite
-            print(f"{Colors.OKBLUE}--- SQLite Benchmark ---{Colors.ENDC}")
-            sqlite_results, sqlite_columns, sqlite_types, sqlite_time = benchmark_query(sqlite_db, query)
-            if sqlite_results:
-                # Add column names and types as a header
-                headers = [f"{col}\n{typ}" for col, typ in zip(sqlite_columns, sqlite_types)]
-                print(f"{Colors.OKBLUE}SQLite Results:{Colors.ENDC}")
-                print(tabulate(sqlite_results, headers=headers, tablefmt="fancy_grid"))
-            else:
-                print(f"{Colors.OKBLUE}SQLite Results:{Colors.ENDC} No results")
-            print(f"{Colors.OKCYAN}SQLite Time:{Colors.ENDC} {sqlite_time:.6f} seconds\n")
+            benchmark_sqlite(sqlite_db, query)
 
             # Benchmark DuckDB
-            print(f"{Colors.OKGREEN}--- DuckDB Benchmark ---{Colors.ENDC}")
-            duckdb_results, duckdb_columns, duckdb_types, duckdb_time = benchmark_query(duckdb_db, query)
-            if duckdb_results:
-                # Add column names and types as a header
-                headers = [f"{col}\n{typ}" for col, typ in zip(duckdb_columns, duckdb_types)]
-                print(f"{Colors.OKGREEN}DuckDB Results:{Colors.ENDC}")
-                print(tabulate(duckdb_results, headers=headers, tablefmt="fancy_grid"))
-            else:
-                print(f"{Colors.OKGREEN}DuckDB Results:{Colors.ENDC} No results")
-            print(f"{Colors.OKCYAN}DuckDB Time:{Colors.ENDC} {duckdb_time:.6f} seconds\n")
+            benchmark_duckdb(duckdb_db, query)
 
             print(f"{Colors.WARNING}{'-' * 60}{Colors.ENDC}")
     
