@@ -213,6 +213,7 @@ tags
 # Extras for this project
 partition
 settings.json
+__pycache__
 
 # Python virtual environment
 /.venv/
