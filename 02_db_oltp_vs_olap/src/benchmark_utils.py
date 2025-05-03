@@ -46,6 +46,4 @@ def __print_table(results, columns, types, db_name):
         headers = [f"{col}\n{typ}" for col, typ in zip(columns, types)]
         print(tabulate(results, headers=headers, tablefmt="fancy_grid"))
     else:
-        overall_header = f" {db_name.upper()} RESULTS ".center(60, "=")
-        print(f"{Colors.OKGREEN if db_name == 'DuckDB' else Colors.OKBLUE}{overall_header}{Colors.ENDC}")
-        print(f"{Colors.OKGREEN if db_name == 'DuckDB' else Colors.OKBLUE}{db_name} Results:{Colors.ENDC} No results")
+        print("No results")
