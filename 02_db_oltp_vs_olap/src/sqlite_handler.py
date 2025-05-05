@@ -1,31 +1,38 @@
 import sqlite3
+import csv
 
 class SQLite:
-    """Interface for interacting with SQLite database."""
-    def __init__(self, db_path):
+    """Interface for interacting with a SQLite database."""
+    def __init__(self, db_path: str):
         self.connection = sqlite3.connect(db_path)
         self.cursor = self.connection.cursor()
 
+    def load_csv(self, table_name: str, csv_path: str):
+        """Bulk-load a CSV (with header) into the given table."""
+        with open(csv_path, newline='') as f:
+            reader = csv.reader(f)
+            cols = next(reader)  # header row
+            placeholder = ", ".join("?" for _ in cols)
+            insert_sql = f"INSERT INTO {table_name} ({', '.join(cols)}) VALUES ({placeholder})"
+            self.cursor.executemany(insert_sql, reader)
+            self.connection.commit()
+
     def __get_column_metadata(self):
-        """Extract column names and types from the cursor description."""
-        column_names = []
-        column_types = []
+        names, types = [], []
         if self.cursor.description:
             for col in self.cursor.description:
-                column_names.append(col[0])
-                column_types.append(type(col[0]).__name__ if col[0] is not None else "None")
-        return column_names, column_types
+                names.append(col[0])
+                types.append(type(col[0]).__name__ if col[0] is not None else "None")
+        return names, types
 
-    def execute_query(self, query, fetch_metadata=True):
+    def execute_query(self, query: str, fetch_metadata: bool = True):
         self.cursor.execute(query)
-        results = self.cursor.fetchall()
-        
+        rows = self.cursor.fetchall()
         if fetch_metadata:
-            column_names, column_types = self.__get_column_metadata()
+            names, types = self.__get_column_metadata()
         else:
-            column_names, column_types = [], []
-        
-        return results, column_names, column_types
+            names, types = [], []
+        return rows, names, types
 
     def close(self):
         self.connection.close()
