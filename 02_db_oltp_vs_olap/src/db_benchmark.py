@@ -40,8 +40,8 @@ def main():
         if not q:
             continue
         print(f"{Colors.WARNING}Query:{Colors.ENDC} {q}")
-        benchmark_sqlite(sqlite_db, q)
-        benchmark_duckdb(duckdb_db, q)
+        benchmark_sqlite(sqlite_db, q, False)
+        benchmark_duckdb(duckdb_db, q, False)
 
     # 5) Clean up
     sqlite_db.close()
