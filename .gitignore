@@ -229,4 +229,4 @@ results
 
 *.db
 
-# End of https://www.toptal.com/developers/gitignore/api/c,visualstudiocode,cmake,macos,vim,emacs,linux
+# End of https://www.toptal.com/developers/gitignore/api/c,visualstudiocode,cmake,macos,vim,emacs,linux02_db_oltp_vs_olap/sql_benchmarks/data/*.csv
