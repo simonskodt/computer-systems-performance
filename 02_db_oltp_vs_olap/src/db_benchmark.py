@@ -1,54 +1,128 @@
 import os
+import argparse
 
 from sqlite_handler import SQLite
 from duckdb_handler import DuckDB
 from benchmark_utils import benchmark_sqlite, benchmark_duckdb
 from colors import Colors
+from enum import Enum
+
+SQL_BENCHMARKS_DIR = "../sql_benchmarks"
+TPC_H = SQL_BENCHMARKS_DIR + "/tpch"
+TPC_C = SQL_BENCHMARKS_DIR + "/tpcc"
+
+class BENCHMARK(Enum):
+    TPC_H = 1
+    TPC_C = 2
+
+def parse_args():
+    """
+    Parses the command-line arguments to select the benchmark to run.
+    """
+    parser = argparse.ArgumentParser(description="Select benchmark to use.")
+    parser.add_argument(
+        '--benchmark',
+        type=str,
+        choices=[b.name for b in BENCHMARK],
+        required=True,
+        help=f"Benchmark to use. Choices: {[b.name for b in BENCHMARK]}"
+    )
+    return parser.parse_args()
 
 def main():
+    """
+    Main entry point of the script. Initializes databases, parses arguments,
+    and runs the selected benchmark.
+    """
     sqlite_db = SQLite('sqlite.db')
     duckdb_db = DuckDB('duckdb.db')
 
-    # 1) Create TPC-H schema in both engines
-    schema_file = '../sql_benchmarks/tpch_setup.sql'
-    print(f"{Colors.OKBLUE}Setting up TPC-H schema...{Colors.ENDC}")
-    _exec_sql_file(sqlite_db, schema_file)
-    _exec_sql_file(duckdb_db, schema_file)
+    # Parse arguments
+    args = parse_args()
+    selected_benchmark = BENCHMARK[args.benchmark]
 
-    # 2) Generate & export TPC-H data in DuckDB
-    print(f"{Colors.OKBLUE}Generating TPC-H data in DuckDB...{Colors.ENDC}")
-    duckdb_db.generate_tpch(scale_factor=1.0)
-
-    print(f"{Colors.OKBLUE}Exporting TPC-H tables to CSV...{Colors.ENDC}")
-    duckdb_db.export_tpch_to_csv(output_dir='data')
-
-    # 3) Load data into SQLite
-    tables = ["region", "nation", "supplier", "customer",
-              "part", "partsupp", "orders", "lineitem"]
-    for tbl in tables:
-        csv_path = os.path.join('data', f"{tbl}.csv")
-        print(f"{Colors.OKGREEN}Loading {tbl} into SQLite from {csv_path}...{Colors.ENDC}")
-        sqlite_db.load_csv(tbl, csv_path)
-
-    # 4) Run benchmarks on each SQL query
-    query_file = '../sql_benchmarks/queries.sql'
-    print(f"{Colors.OKBLUE}Running benchmarks on queries from {query_file}...{Colors.ENDC}")
-    with open(query_file, 'r') as f:
-        all_sql = f.read().strip()
-    for q in all_sql.split(';'):
-        q = q.strip()
-        if not q:
-            continue
-        print(f"{Colors.WARNING}Query:{Colors.ENDC} {q}")
-        benchmark_sqlite(sqlite_db, q, False)
-        benchmark_duckdb(duckdb_db, q, False)
+    if selected_benchmark == BENCHMARK.TPC_H:
+        __run_tpch(sqlite_db, duckdb_db)
+    elif selected_benchmark == BENCHMARK.TPC_C:
+        __run_tpcc(sqlite_db, duckdb_db)
 
     # 5) Clean up
     sqlite_db.close()
     duckdb_db.close()
 
-def _exec_sql_file(db, path: str):
-    """Utility to run all statements in a .sql file."""
+def __run_tpch(sqlite_db, duckdb_db):
+    """
+    Executes the TPC-H benchmark by setting up schemas, generating data,
+    loading data, and running queries.
+    """
+    # Create TPC-H schema in both engines
+    schema_file = f"{TPC_H}/setup.sql"
+    print(f"{Colors.OKBLUE}Setting up TPC-H schema...{Colors.ENDC}")
+    __exec_sql_file(sqlite_db, schema_file)
+    __exec_sql_file(duckdb_db, schema_file)
+
+    # Generate & export TPC-H data in DuckDB
+    print(f"{Colors.OKBLUE}Generating TPC-H data in DuckDB...{Colors.ENDC}")
+    duckdb_db.generate_tpch(scale_factor=1.0)
+
+    print(f"{Colors.OKBLUE}Exporting TPC-H tables to CSV...{Colors.ENDC}")
+    duckdb_db.export_tpch_to_csv()
+
+    # Load data into SQLite
+    tables = ["region", "nation", "supplier", "customer",
+            "part", "partsupp", "orders", "lineitem"]
+    for tbl in tables:
+        csv_path = os.path.join(f"{SQL_BENCHMARKS_DIR}/data", f"{tbl}.csv")
+        print(f"{Colors.OKGREEN}Loading {tbl} into SQLite from {csv_path}...{Colors.ENDC}")
+        sqlite_db.load_csv(tbl, csv_path)
+
+    # Run benchmarks on specified queries
+    query_numbers = [1, 4, 6]
+    print(f"{Colors.OKBLUE}Running benchmarks on TPC-H queries: {query_numbers}...{Colors.ENDC}")
+    
+    # Read all queries from the queries.sql file
+    queries = {}
+    with open(f"{SQL_BENCHMARKS_DIR}/queries.sql", 'r') as f:
+        content = f.read()
+        # Split the content by query ID markers
+        query_blocks = content.split('-- Query ID:')
+        for block in query_blocks[1:]:  # Skip the first empty block
+            # Extract the query ID and query text
+            lines = block.strip().split('\n')
+            if lines:
+                query_id = int(lines[0].strip())
+                query_text = '\n'.join(lines[1:]).strip()
+                # Remove any trailing semicolons and clean up
+                while query_text.endswith(';'):
+                    query_text = query_text[:-1].strip()
+                queries[query_id] = query_text
+    
+    # Execute the queries
+    for query_number in query_numbers:
+        print(f"{Colors.HEADER}{'=' * 60}{Colors.ENDC}")
+        centered_text = f" Running TPC-H Query {query_number} ".center(60, "-")
+        print(f"{Colors.HEADER}{Colors.BOLD}{centered_text}{Colors.ENDC}")
+        print(f"{Colors.HEADER}{'=' * 60}{Colors.ENDC}")
+        if query_number in queries:
+            query = queries[query_number]
+            print(f"{query.strip()}")
+            print(f"{Colors.HEADER}{'-' * 60}{Colors.ENDC}")
+            benchmark_sqlite(sqlite_db, query, False)
+            benchmark_duckdb(duckdb_db, query, False)
+        else:
+            print(f"{Colors.FAIL}Query {query_number} not found in queries.sql{Colors.ENDC}")
+
+def __run_tpcc(sqlite_db, duckdb_db):
+    """
+    Executes the TPC-C benchmark by setting up schemas, generating data,
+    loading data, and running queries.
+    """
+    print(f"{Colors.OKBLUE}TPC-C benchmark is not yet implemented.{Colors.ENDC}")
+
+def __exec_sql_file(db, path: str):
+    """
+    Executes all SQL statements in the specified file on the given database.
+    """
     with open(path, 'r') as f:
         sql = f.read()
     for stmt in sql.split(';'):
