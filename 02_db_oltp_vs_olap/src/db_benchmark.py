@@ -11,9 +11,11 @@ SQL_BENCHMARKS_DIR = "../sql_benchmarks"
 TPC_H = SQL_BENCHMARKS_DIR + "/tpch"
 TPC_C = SQL_BENCHMARKS_DIR + "/tpcc"
 
+
 class BENCHMARK(Enum):
     TPC_H = 1
     TPC_C = 2
+
 
 def parse_args():
     """
@@ -34,6 +36,7 @@ def parse_args():
     )
     return parser.parse_args()
 
+
 def main():
     """
     Main entry point of the script. Initializes databases, parses arguments,
@@ -41,7 +44,7 @@ def main():
     """
 
     # if you used the same files before, remove them
-    for p in ['sqlite.db', 'duckdb.db']:
+    for p in ['sqlite.db', 'duckdb.db', 'latencies.txt']:
         try:
             os.remove(p)
         except FileNotFoundError:
@@ -63,6 +66,7 @@ def main():
     sqlite_db.close()
     duckdb_db.close()
 
+
 def __run_tpch(sqlite_db, duckdb_db, run_all: bool = False):
     """
     Executes the TPC-H benchmark by setting up schemas, generating data,
@@ -83,12 +87,13 @@ def __run_tpch(sqlite_db, duckdb_db, run_all: bool = False):
 
     # Load data into SQLite
     tables = ["region", "nation", "supplier", "customer",
-            "part", "partsupp", "orders", "lineitem"]
+              "part", "partsupp", "orders", "lineitem"]
     for tbl in tables:
         csv_path = os.path.join(f"{SQL_BENCHMARKS_DIR}/data", f"{tbl}.csv")
-        print(f"{Colors.OKGREEN}Loading {tbl} into SQLite from {csv_path}...{Colors.ENDC}")
+        print(
+            f"{Colors.OKGREEN}Loading {tbl} into SQLite from {csv_path}...{Colors.ENDC}")
         sqlite_db.load_csv(tbl, csv_path)
-    
+
     # Read all queries from the queries.sql file
     queries = {}
     with open(f"{SQL_BENCHMARKS_DIR}/tpch/queries.sql", 'r') as f:
@@ -113,7 +118,7 @@ def __run_tpch(sqlite_db, duckdb_db, run_all: bool = False):
         query_numbers = [1, 4, 6]
 
     print(f"{Colors.OKBLUE}Running benchmarks on TPC-H queries: {query_numbers}...{Colors.ENDC}")
-    
+
     # Execute the queries
     for query_number in query_numbers:
         print(f"{Colors.HEADER}{'=' * 60}{Colors.ENDC}")
@@ -134,7 +139,9 @@ def __run_tpch(sqlite_db, duckdb_db, run_all: bool = False):
                     f"Query {query_number}: SQLite={sqlite_time:.6f}s, DuckDB={duckdb_time:.6f}s\n"
                 )
         else:
-            print(f"{Colors.FAIL}Query {query_number} not found in queries.sql{Colors.ENDC}")
+            print(
+                f"{Colors.FAIL}Query {query_number} not found in queries.sql{Colors.ENDC}")
+
 
 def __run_tpcc(sqlite_db, duckdb_db, run_all: bool = False):
     """
@@ -149,10 +156,11 @@ def __run_tpcc(sqlite_db, duckdb_db, run_all: bool = False):
 
     # Load data into SQLite
     tables = ["CUSTOMER", "HISTORY", "NEW_ORDER", "WAREHOUSE",
-            "DISTRICT", "ITEM", "ORDER_LINE", "STOCK"]
+              "DISTRICT", "ITEM", "ORDER_LINE", "STOCK"]
     for tbl in tables:
         csv_path = os.path.join(f"/tmp/tpcc-tables", f"{tbl}.csv")
-        print(f"{Colors.OKGREEN}Loading {tbl} into SQLite from {csv_path}...{Colors.ENDC}")
+        print(
+            f"{Colors.OKGREEN}Loading {tbl} into SQLite from {csv_path}...{Colors.ENDC}")
         sqlite_db.load_csv(tbl, csv_path)
 
     # Read all queries from the queries.sql file
@@ -188,9 +196,9 @@ def __run_tpcc(sqlite_db, duckdb_db, run_all: bool = False):
             query = queries[query_number]
             print(query)
             print(f"{Colors.HEADER}{'-'*60}{Colors.ENDC}")
-            sqlite_time = benchmark_sqlite(sqlite_db, query, False)
+            sqlite_time = benchmark_sqlite(sqlite_db, query, True)
             print(f"SQLite Time: {sqlite_time:.6f} seconds")
-            duckdb_time = benchmark_duckdb(duckdb_db, query, False)
+            duckdb_time = benchmark_duckdb(duckdb_db, query, True)
             print(f"DuckDB Time: {duckdb_time:.6f} seconds")
 
             with open("latencies.txt", "a") as log:
@@ -199,6 +207,7 @@ def __run_tpcc(sqlite_db, duckdb_db, run_all: bool = False):
                 )
         else:
             print(f"{Colors.FAIL}Query {query} not found!{Colors.ENDC}")
+
 
 def __exec_sql_file(db, path: str):
     """
@@ -209,6 +218,7 @@ def __exec_sql_file(db, path: str):
     for stmt in sql.split(';'):
         if stmt.strip():
             db.execute_query(stmt)
+
 
 if __name__ == "__main__":
     main()
