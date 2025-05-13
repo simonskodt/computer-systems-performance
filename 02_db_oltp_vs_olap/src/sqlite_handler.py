@@ -1,21 +1,48 @@
 import sqlite3
 import csv
 
+import sqlite3
+import csv
+
 class SQLite:
-    """Interface for interacting with a SQLite database."""
     def __init__(self, db_path: str):
         self.connection = sqlite3.connect(db_path)
         self.cursor = self.connection.cursor()
 
     def load_csv(self, table_name: str, csv_path: str):
-        """Bulk-load a CSV (with header) into the given table."""
+        # 1) Get the column names from the table schema
+        self.cursor.execute(f"PRAGMA table_info({table_name});")
+        cols_info = self.cursor.fetchall()
+        if not cols_info:
+            raise ValueError(f"Table {table_name} has no columns or does not exist")
+        cols = [col[1] for col in cols_info]  # column-name is at index 1
+
+        # 2) Build the INSERT statement
+        placeholders = ", ".join("?" for _ in cols)
+        insert_sql = f"INSERT INTO {table_name} ({', '.join(cols)}) VALUES ({placeholders});"
+
+        # 3) Read the CSV, detect header, and collect all data rows
+        rows = []
         with open(csv_path, newline='') as f:
             reader = csv.reader(f)
-            cols = next(reader)  # header row
-            placeholder = ", ".join("?" for _ in cols)
-            insert_sql = f"INSERT INTO {table_name} ({', '.join(cols)}) VALUES ({placeholder})"
-            self.cursor.executemany(insert_sql, reader)
+            try:
+                first = next(reader)
+            except StopIteration:
+                return  # empty file, nothing to load
+
+            # If the first row *exactly* matches our column names, skip it
+            if first != cols:
+                rows.append(first)
+
+            # Read the rest
+            for row in reader:
+                rows.append(row)
+
+        # 4) Bulk‐insert
+        if rows:
+            self.cursor.executemany(insert_sql, rows)
             self.connection.commit()
+
 
     def __get_column_metadata(self):
         names, types = [], []

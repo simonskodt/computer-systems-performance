@@ -23,6 +23,7 @@ def benchmark_sqlite(sqlite_db, query, print_results=True):
         __print_table(sqlite_results, sqlite_columns, sqlite_types, "SQLite")
 
     print(f"SQLite Time: {sqlite_time:.6f} seconds")
+    return sqlite_time
 
 def benchmark_duckdb(duckdb_db, query, print_results=True):
     """Benchmark and optionally print results for DuckDB."""
@@ -35,6 +36,7 @@ def benchmark_duckdb(duckdb_db, query, print_results=True):
         __print_table(duckdb_results, duckdb_columns, duckdb_types, "DuckDB")
 
     print(f"DuckDB Time: {duckdb_time:.6f} seconds")
+    return duckdb_time
 
 def __print_table(results, columns, types, db_name):
     """Print the results in a tabular format."""

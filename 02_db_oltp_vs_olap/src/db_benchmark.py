@@ -3,7 +3,7 @@ import argparse
 
 from sqlite_handler import SQLite
 from duckdb_handler import DuckDB
-from benchmark_utils import benchmark_sqlite, benchmark_duckdb
+from benchmark_utils import benchmark_sqlite, benchmark_duckdb, benchmark_query
 from colors import Colors
 from enum import Enum
 
@@ -27,6 +27,11 @@ def parse_args():
         required=True,
         help=f"Benchmark to use. Choices: {[b.name for b in BENCHMARK]}"
     )
+    parser.add_argument(
+        '--all',
+        action='store_true',
+        help="Run all available queries instead of the default subset"
+    )
     return parser.parse_args()
 
 def main():
@@ -34,6 +39,14 @@ def main():
     Main entry point of the script. Initializes databases, parses arguments,
     and runs the selected benchmark.
     """
+
+    # if you used the same files before, remove them
+    for p in ['sqlite.db', 'duckdb.db']:
+        try:
+            os.remove(p)
+        except FileNotFoundError:
+            pass
+
     sqlite_db = SQLite('sqlite.db')
     duckdb_db = DuckDB('duckdb.db')
 
@@ -42,15 +55,15 @@ def main():
     selected_benchmark = BENCHMARK[args.benchmark]
 
     if selected_benchmark == BENCHMARK.TPC_H:
-        __run_tpch(sqlite_db, duckdb_db)
+        __run_tpch(sqlite_db, duckdb_db, run_all=args.all)
     elif selected_benchmark == BENCHMARK.TPC_C:
-        __run_tpcc(sqlite_db, duckdb_db)
+        __run_tpcc(sqlite_db, duckdb_db, run_all=args.all)
 
     # 5) Clean up
     sqlite_db.close()
     duckdb_db.close()
 
-def __run_tpch(sqlite_db, duckdb_db):
+def __run_tpch(sqlite_db, duckdb_db, run_all: bool = False):
     """
     Executes the TPC-H benchmark by setting up schemas, generating data,
     loading data, and running queries.
@@ -75,27 +88,31 @@ def __run_tpch(sqlite_db, duckdb_db):
         csv_path = os.path.join(f"{SQL_BENCHMARKS_DIR}/data", f"{tbl}.csv")
         print(f"{Colors.OKGREEN}Loading {tbl} into SQLite from {csv_path}...{Colors.ENDC}")
         sqlite_db.load_csv(tbl, csv_path)
-
-    # Run benchmarks on specified queries
-    query_numbers = [1, 4, 6]
-    print(f"{Colors.OKBLUE}Running benchmarks on TPC-H queries: {query_numbers}...{Colors.ENDC}")
     
     # Read all queries from the queries.sql file
     queries = {}
-    with open(f"{SQL_BENCHMARKS_DIR}/queries.sql", 'r') as f:
+    with open(f"{SQL_BENCHMARKS_DIR}/tpch/queries.sql", 'r') as f:
         content = f.read()
         # Split the content by query ID markers
         query_blocks = content.split('-- Query ID:')
         for block in query_blocks[1:]:  # Skip the first empty block
-            # Extract the query ID and query text
             lines = block.strip().split('\n')
-            if lines:
-                query_id = int(lines[0].strip())
-                query_text = '\n'.join(lines[1:]).strip()
-                # Remove any trailing semicolons and clean up
-                while query_text.endswith(';'):
-                    query_text = query_text[:-1].strip()
-                queries[query_id] = query_text
+            if not lines:
+                continue
+            query_id = int(lines[0].strip())
+            query_text = '\n'.join(lines[1:]).strip()
+            # Remove any trailing semicolons
+            while query_text.endswith(';'):
+                query_text = query_text[:-1].strip()
+            queries[query_id] = query_text
+
+    # --- pick which queries to run ---
+    if run_all:
+        query_numbers = sorted(queries.keys())
+    else:
+        query_numbers = [1, 4, 6]
+
+    print(f"{Colors.OKBLUE}Running benchmarks on TPC-H queries: {query_numbers}...{Colors.ENDC}")
     
     # Execute the queries
     for query_number in query_numbers:
@@ -107,17 +124,81 @@ def __run_tpch(sqlite_db, duckdb_db):
             query = queries[query_number]
             print(f"{query.strip()}")
             print(f"{Colors.HEADER}{'-' * 60}{Colors.ENDC}")
-            benchmark_sqlite(sqlite_db, query, False)
-            benchmark_duckdb(duckdb_db, query, False)
+            sqlite_time = benchmark_sqlite(sqlite_db, query, False)
+            print(f"SQLite Time: {sqlite_time:.6f} seconds")
+            duckdb_time = benchmark_duckdb(duckdb_db, query, False)
+            print(f"DuckDB Time: {duckdb_time:.6f} seconds")
+
+            with open("latencies.txt", "a") as log:
+                log.write(
+                    f"Query {query_number}: SQLite={sqlite_time:.6f}s, DuckDB={duckdb_time:.6f}s\n"
+                )
         else:
             print(f"{Colors.FAIL}Query {query_number} not found in queries.sql{Colors.ENDC}")
 
-def __run_tpcc(sqlite_db, duckdb_db):
+def __run_tpcc(sqlite_db, duckdb_db, run_all: bool = False):
     """
     Executes the TPC-C benchmark by setting up schemas, generating data,
     loading data, and running queries.
     """
-    print(f"{Colors.OKBLUE}TPC-C benchmark is not yet implemented.{Colors.ENDC}")
+    # Create TPC-C schema in both engines
+    schema_file = f"{TPC_C}/setup.sql"
+    print(f"{Colors.OKBLUE}Setting up TPC-C schema...{Colors.ENDC}")
+    __exec_sql_file(sqlite_db, schema_file)
+    __exec_sql_file(duckdb_db, schema_file)
+
+    # Load data into SQLite
+    tables = ["CUSTOMER", "HISTORY", "NEW_ORDER", "WAREHOUSE",
+            "DISTRICT", "ITEM", "ORDER_LINE", "STOCK"]
+    for tbl in tables:
+        csv_path = os.path.join(f"/tmp/tpcc-tables", f"{tbl}.csv")
+        print(f"{Colors.OKGREEN}Loading {tbl} into SQLite from {csv_path}...{Colors.ENDC}")
+        sqlite_db.load_csv(tbl, csv_path)
+
+    # Read all queries from the queries.sql file
+    queries = {}
+    with open(f"{SQL_BENCHMARKS_DIR}/tpcc/queries.sql", 'r') as f:
+        content = f.read()
+        # Split the content by query ID markers
+        query_blocks = content.split('-- Query ID:')
+        for block in query_blocks[1:]:  # Skip the first empty block
+            lines = block.strip().split('\n')
+            if not lines:
+                continue
+            query_id = int(lines[0].strip())
+            query_text = '\n'.join(lines[1:]).strip()
+            # Remove any trailing semicolons
+            while query_text.endswith(';'):
+                query_text = query_text[:-1].strip()
+            queries[query_id] = query_text
+
+    if run_all:
+        query_numbers = sorted(queries.keys())
+    else:
+        query_numbers = [1, 4, 6]
+
+    print(f"{Colors.OKBLUE}Running TPC-C queries: {query_numbers}...{Colors.ENDC}")
+
+    for query_number in query_numbers:
+        print(f"{Colors.HEADER}{'='*60}{Colors.ENDC}")
+        title = f" Running TPC-C Query {query_number} ".center(60, "-")
+        print(f"{Colors.HEADER}{Colors.BOLD}{title}{Colors.ENDC}")
+        print(f"{Colors.HEADER}{'='*60}{Colors.ENDC}")
+        if query_number in queries:
+            query = queries[query_number]
+            print(query)
+            print(f"{Colors.HEADER}{'-'*60}{Colors.ENDC}")
+            sqlite_time = benchmark_sqlite(sqlite_db, query, False)
+            print(f"SQLite Time: {sqlite_time:.6f} seconds")
+            duckdb_time = benchmark_duckdb(duckdb_db, query, False)
+            print(f"DuckDB Time: {duckdb_time:.6f} seconds")
+
+            with open("latencies.txt", "a") as log:
+                log.write(
+                    f"Query {query_number}: SQLite={sqlite_time:.6f}s, DuckDB={duckdb_time:.6f}s\n"
+                )
+        else:
+            print(f"{Colors.FAIL}Query {query} not found!{Colors.ENDC}")
 
 def __exec_sql_file(db, path: str):
     """

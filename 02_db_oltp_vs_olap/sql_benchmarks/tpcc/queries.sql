@@ -1,0 +1,2 @@
+-- Query ID: 1
+SELECT * FROM WAREHOUSE;
