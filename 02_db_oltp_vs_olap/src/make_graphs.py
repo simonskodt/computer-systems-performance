@@ -5,14 +5,6 @@ import math
 import matplotlib.pyplot as plt
 
 
-# open file ./latencies.txt and read the lines. It looks like this:
-"""
-Query 1: SQLite=46.300562s, DuckDB=0.088537s
-Query 4: SQLite=12.348399s, DuckDB=0.106822s
-Query 6: SQLite=37.824267s, DuckDB=0.011041s
-"""
-
-
 def read_latencies(file_path):
     latencies = {}
     with open(file_path, "r") as file:
@@ -30,9 +22,6 @@ def read_latencies(file_path):
     print("Latencies:")
     pprint.pp(latencies)
     return latencies
-
-# From the latencies dictionary, create a bar graph with the query number on the x-axis and the time on the y-axis in a logarithmic scale.
-# The bar graph should have two bars for each query, one for SQLite and one for DuckDB.
 
 
 def create_bar_graph(latencies):

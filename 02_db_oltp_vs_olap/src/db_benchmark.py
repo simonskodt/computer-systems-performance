@@ -34,6 +34,13 @@ def parse_args():
         action='store_true',
         help="Run all available queries instead of the default subset"
     )
+
+    parser.add_argument(
+        '-r',
+        '--reuse',
+        action='store_true',
+        help="Reuse existing data files instead of generating new ones"
+    )
     return parser.parse_args()
 
 
@@ -43,8 +50,16 @@ def main():
     and runs the selected benchmark.
     """
 
+    # Parse arguments
+    args = parse_args()
+    selected_benchmark = BENCHMARK[args.benchmark]
+    reuse_data = args.reuse
+
     # if you used the same files before, remove them
-    for p in ['sqlite.db', 'duckdb.db', 'latencies.txt']:
+    files_to_remove = ['latencies.txt']
+    if reuse_data:
+        files_to_remove.extend(['sqlite.db', 'duckdb.db'])
+    for p in files_to_remove:
         try:
             os.remove(p)
         except FileNotFoundError:
@@ -53,46 +68,47 @@ def main():
     sqlite_db = SQLite('sqlite.db')
     duckdb_db = DuckDB('duckdb.db')
 
-    # Parse arguments
-    args = parse_args()
-    selected_benchmark = BENCHMARK[args.benchmark]
-
     if selected_benchmark == BENCHMARK.TPC_H:
-        __run_tpch(sqlite_db, duckdb_db, run_all=args.all)
+        __run_tpch(sqlite_db, duckdb_db, run_all=args.all,
+                   reuse_data=reuse_data)
     elif selected_benchmark == BENCHMARK.TPC_C:
-        __run_tpcc(sqlite_db, duckdb_db, run_all=args.all)
+        __run_tpcc(sqlite_db, duckdb_db, run_all=args.all,
+                   reuse_data=reuse_data)
 
     # 5) Clean up
     sqlite_db.close()
     duckdb_db.close()
 
 
-def __run_tpch(sqlite_db, duckdb_db, run_all: bool = False):
+def __run_tpch(sqlite_db, duckdb_db, run_all: bool = False, reuse_data: bool = False):
     """
     Executes the TPC-H benchmark by setting up schemas, generating data,
     loading data, and running queries.
     """
-    # Create TPC-H schema in both engines
-    schema_file = f"{TPC_H}/setup.sql"
-    print(f"{Colors.OKBLUE}Setting up TPC-H schema...{Colors.ENDC}")
-    __exec_sql_file(sqlite_db, schema_file)
-    __exec_sql_file(duckdb_db, schema_file)
+    if not reuse_data:
+        # Create TPC-H schema in both engines
+        schema_file = f"{TPC_H}/setup.sql"
+        print(f"{Colors.OKBLUE}Setting up TPC-H schema...{Colors.ENDC}")
+        __exec_sql_file(sqlite_db, schema_file)
+        __exec_sql_file(duckdb_db, schema_file)
 
-    # Generate & export TPC-H data in DuckDB
-    print(f"{Colors.OKBLUE}Generating TPC-H data in DuckDB...{Colors.ENDC}")
-    duckdb_db.generate_tpch(scale_factor=1.0)
+        # Generate & export TPC-H data in DuckDB
+        print(f"{Colors.OKBLUE}Generating TPC-H data in DuckDB...{Colors.ENDC}")
+        duckdb_db.generate_tpch(scale_factor=1.0)
 
-    print(f"{Colors.OKBLUE}Exporting TPC-H tables to CSV...{Colors.ENDC}")
-    duckdb_db.export_tpch_to_csv()
+        print(f"{Colors.OKBLUE}Exporting TPC-H tables to CSV...{Colors.ENDC}")
+        duckdb_db.export_tpch_to_csv()
 
-    # Load data into SQLite
-    tables = ["region", "nation", "supplier", "customer",
-              "part", "partsupp", "orders", "lineitem"]
-    for tbl in tables:
-        csv_path = os.path.join(f"{SQL_BENCHMARKS_DIR}/data", f"{tbl}.csv")
-        print(
-            f"{Colors.OKGREEN}Loading {tbl} into SQLite from {csv_path}...{Colors.ENDC}")
-        sqlite_db.load_csv(tbl, csv_path)
+        # Load data into SQLite
+        tables = ["region", "nation", "supplier", "customer",
+                  "part", "partsupp", "orders", "lineitem"]
+        for tbl in tables:
+            csv_path = os.path.join(f"{SQL_BENCHMARKS_DIR}/data", f"{tbl}.csv")
+            print(
+                f"{Colors.OKGREEN}Loading {tbl} into SQLite from {csv_path}...{Colors.ENDC}")
+            sqlite_db.load_csv(tbl, csv_path)
+    else:
+        print(f"{Colors.OKBLUE}Reusing existing data...{Colors.ENDC}")
 
     # Read all queries from the queries.sql file
     queries = {}
