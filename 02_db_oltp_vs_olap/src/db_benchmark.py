@@ -57,7 +57,7 @@ def main():
 
     # if you used the same files before, remove them
     files_to_remove = ['latencies.txt']
-    if reuse_data:
+    if not reuse_data:
         files_to_remove.extend(['sqlite.db', 'duckdb.db'])
     for p in files_to_remove:
         try:
