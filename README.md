@@ -11,4 +11,4 @@ In [`01_partitioning`](./01_partitioning), the task in this assignment is to rep
 
 ## Project 02
 
-To-do.
+In [`02_db_oltp_vs_olap`](./02_db_oltp_vs_olap), we compare two embedded database technologies: DuckDB and SQLite. We examine these databases to highlight their different designs, where DuckDB is optimised for OLAP (analytical processing) and SQLite for OLTP (transactional processing). We use TPC-H and TPC-C benchmarks to evaluate the strengths and weaknesses of these databases.

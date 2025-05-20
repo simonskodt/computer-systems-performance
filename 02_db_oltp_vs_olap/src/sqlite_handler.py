@@ -1,15 +1,13 @@
-import sqlite3
-import csv
-
+from typing import List, Tuple, Any
 import sqlite3
 import csv
 
 class SQLite:
-    def __init__(self, db_path: str):
-        self.connection = sqlite3.connect(db_path)
-        self.cursor = self.connection.cursor()
+    def __init__(self, db_path: str) -> None:
+        self.connection: sqlite3.Connection = sqlite3.connect(db_path)
+        self.cursor: sqlite3.Cursor = self.connection.cursor()
 
-    def load_csv(self, table_name: str, csv_path: str):
+    def load_csv(self, table_name: str, csv_path: str) -> None:
         # 1) Get the column names from the table schema
         self.cursor.execute(f"PRAGMA table_info({table_name});")
         cols_info = self.cursor.fetchall()
@@ -43,23 +41,25 @@ class SQLite:
             self.cursor.executemany(insert_sql, rows)
             self.connection.commit()
 
-
-    def __get_column_metadata(self):
-        names, types = [], []
+    def __get_column_metadata(self) -> Tuple[List[str], List[str]]:
+        names: List[str] = []
+        types: List[str] = []
         if self.cursor.description:
             for col in self.cursor.description:
                 names.append(col[0])
                 types.append(type(col[0]).__name__ if col[0] is not None else "None")
         return names, types
 
-    def execute_query(self, query: str, fetch_metadata: bool = True):
+    def execute_query(self, query: str, fetch_metadata: bool = True) -> Tuple[List[Tuple[Any, ...]], List[str], List[str]]:
         self.cursor.execute(query)
-        rows = self.cursor.fetchall()
+        rows: List[Tuple[Any, ...]] = self.cursor.fetchall()
+
         if fetch_metadata:
             names, types = self.__get_column_metadata()
         else:
             names, types = [], []
+
         return rows, names, types
 
-    def close(self):
+    def close(self) -> None:
         self.connection.close()

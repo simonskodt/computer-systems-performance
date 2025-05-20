@@ -1,18 +1,20 @@
 from colors import Colors
 import time
 from tabulate import tabulate
+from typing import List, Tuple, Any
 
-def benchmark_query(db, query, print_results=True):
+def benchmark_query(db: Any, query: str, print_results: bool = True) -> Tuple[List[Tuple[Any, ...]], List[str], List[str], float]:
     """Benchmark the execution time of a query."""
     start_time = time.time()
-    results, column_names, column_types = db.execute_query(query, print_results)
+    results, column_names, column_types = db.execute_query(
+        query, fetch_metadata=print_results)
     end_time = time.time()
 
     execution_time = end_time - start_time
 
     return results, column_names, column_types, execution_time
 
-def benchmark_sqlite(sqlite_db, query, print_results=True):
+def benchmark_sqlite(sqlite_db: Any, query: str, print_results: bool = True) -> float:
     """Benchmark and optionally print results for SQLite."""
     sqlite_results, \
     sqlite_columns, \
@@ -22,10 +24,9 @@ def benchmark_sqlite(sqlite_db, query, print_results=True):
     if print_results:
         __print_table(sqlite_results, sqlite_columns, sqlite_types, "SQLite")
 
-    print(f"SQLite Time: {sqlite_time:.6f} seconds")
     return sqlite_time
 
-def benchmark_duckdb(duckdb_db, query, print_results=True):
+def benchmark_duckdb(duckdb_db: Any, query: str, print_results: bool = True) -> float:
     """Benchmark and optionally print results for DuckDB."""
     duckdb_results, \
     duckdb_columns, \
@@ -35,17 +36,20 @@ def benchmark_duckdb(duckdb_db, query, print_results=True):
     if print_results:
         __print_table(duckdb_results, duckdb_columns, duckdb_types, "DuckDB")
 
-    print(f"DuckDB Time: {duckdb_time:.6f} seconds")
     return duckdb_time
 
-def __print_table(results, columns, types, db_name):
+def __print_table(results: List[Tuple[Any, ...]], columns: List[str], types: List[str], db_name: str) -> None:
     """Print the results in a tabular format."""
-    if results:
-        # Add an overall header for the database name
-        print(f" {db_name.upper()} RESULTS ".center(60))
 
-        # Add column names and types as a header
-        headers = [f"{col}\n{typ}" for col, typ in zip(columns, types)]
-        print(tabulate(results, headers=headers, tablefmt="fancy_grid"))
+    if results:
+        Colors.print_colored(f" {db_name.upper()} RESULTS ".center(60), Colors.HEADER)
+
+        Colors.print_colored(f"Debug: {db_name} - Results: {results}", Colors.WARNING)
+        Colors.print_colored(f"Debug: {db_name} - Columns: {columns}", Colors.WARNING)
+        Colors.print_colored(f"Debug: {db_name} - Types: {types}", Colors.WARNING)
+
+        # Pretty format, uncomment to see
+        # headers = [f"{col}\n{typ}" for col, typ in zip(columns, types)]
+        # print(tabulate(results, headers=headers, tablefmt="fancy_grid"))
     else:
-        print("No results")
+        Colors.print_colored(f"No results for query executed on {db_name}.", Colors.FAIL)
