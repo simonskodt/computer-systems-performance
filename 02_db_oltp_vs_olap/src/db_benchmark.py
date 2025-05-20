@@ -189,8 +189,17 @@ def __run_tpcc(sqlite_db, duckdb_db, run_all: bool = False, scale_factor: float 
 
     q = stock_level_query(warehouse_id, district_id, 100)
     print(f"{Colors.OKCYAN}Stock‐Level SQL:{Colors.ENDC}\n{q}")
+    sqlite_db.connection.isolation_level = None
+    sqlite_db.connection.execute("begin")
     benchmark_sqlite(sqlite_db, q, True)
+    sqlite_db.connection.execute("commit")
+
+
+
+    duckdb_db.con.begin()
     benchmark_duckdb(duckdb_db, q, True)
+    duckdb_db.con.commit()
+
 
     print("Running Delivery transaction")
     # SQLite
