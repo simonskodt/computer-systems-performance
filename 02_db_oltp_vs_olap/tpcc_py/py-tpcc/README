@@ -1,4 +1,0 @@
-python tpcc.py csv --no-execute
-
-
-saves the data to tmp/ folder on linux
