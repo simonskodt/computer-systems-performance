@@ -77,7 +77,7 @@ def main() -> None:
     Colors.print_colored("Starting the database benchmark script...", Colors.HEADER)
 
     # If used the same files before, remove them
-    files_to_remove: List[str] = ['latencies.txt']
+    files_to_remove: List[str] = []
     if not reuse_data:
         files_to_remove.extend(['sqlite.db', 'duckdb.db'])
     for p in files_to_remove:
@@ -103,6 +103,25 @@ def main() -> None:
     sqlite_db.close()
     duckdb_db.close()
     Colors.print_colored("Benchmark script completed successfully.", Colors.OKGREEN)
+
+def write_benchmark_output(benchmark_name: str, scale_factor: float, content: str) -> None:
+    """
+    Writes benchmark output to a file in ../out with a name based on the benchmark and scale factor.
+    If run_number is provided, prepends "Run X:" to the content.
+
+    Args:
+        benchmark_name (str): Name of the benchmark (e.g., "TPC-H" or "TPC-C").
+        scale_factor (float): The scale factor used.
+        content (str): The content to write.
+        run_number (Optional[int]): The run number (for repeated runs).
+    """
+    os.makedirs("../out", exist_ok=True)
+    file_name = f"{benchmark_name.upper()}_SF_{scale_factor}.txt"
+    file_path = os.path.join("../out", file_name)
+    with open(file_path, "a") as f:
+        f.write(content)
+        if not content.endswith('\n'):
+            f.write('\n')
 
 ############################################
 #                  TPC-H                   #
@@ -196,10 +215,8 @@ def run_tpch(sqlite_db: SQLite, duckdb_db: DuckDB, run_all: bool = False, reuse_
             duckdb_time = benchmark_duckdb(duckdb_db, duckdb_query, show_results)
             Colors.print_colored(f"DuckDB Time: {duckdb_time:.6f} seconds", Colors.OKGREEN)
 
-            with open("latencies.txt", "a") as log:
-                log.write(
-                    f"Query {query_number}: SQLite={sqlite_time:.6f}s, DuckDB={duckdb_time:.6f}s\n"
-                )
+            content: str = f"Query {query_number}: SQLite={sqlite_time:.6f}s, DuckDB={duckdb_time:.6f}s\n"
+            write_benchmark_output("TPC-H", scale_factor, content, )
         else:
             Colors.print_colored(f"Query {query_number} not found in queries.sql", Colors.FAIL)
 
@@ -505,7 +522,6 @@ def exec_sql_file(db: SQLite | DuckDB, path: str) -> None:
         if stmt.strip():
             db.execute_query(stmt)
     Colors.print_colored(f"Finished executing SQL file: {path}", Colors.OKGREEN)
-
 
 if __name__ == "__main__":
     main()
