@@ -1,0 +1,15 @@
+StockLevel: SQLite=0.002148s, DuckDB=0.003392s
+Delivery: SQLite=0.067340s, DuckDB=0.054140s
+OrderStatus: SQLite=0.000253s, DuckDB=0.002939s
+StockLevel: SQLite=0.004690s, DuckDB=0.003593s
+Delivery: SQLite=0.107754s, DuckDB=0.054359s
+OrderStatus: SQLite=0.000295s, DuckDB=0.002820s
+StockLevel: SQLite=0.002061s, DuckDB=0.004724s
+Delivery: SQLite=0.979023s, DuckDB=0.267079s
+OrderStatus: SQLite=0.000257s, DuckDB=0.003277s
+StockLevel: SQLite=0.002510s, DuckDB=0.003502s
+Delivery: SQLite=1.068784s, DuckDB=0.187228s
+OrderStatus: SQLite=0.000508s, DuckDB=0.003255s
+StockLevel: SQLite=0.004380s, DuckDB=0.003586s
+Delivery: SQLite=0.092457s, DuckDB=0.056115s
+OrderStatus: SQLite=0.000310s, DuckDB=0.002899s
