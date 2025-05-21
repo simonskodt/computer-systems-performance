@@ -260,43 +260,70 @@ def run_tpcc(sqlite_db: SQLite, duckdb_db: DuckDB, run_all: bool = False, reuse_
     warehouse_id = random.randint(1,int(scale_factor))
     district_id = random.randint(1,10)
 
+    # 1) Stock‐Level
     q = stock_level_query(warehouse_id, district_id, 100)
-    print(f"{Colors.OKCYAN}Stock‐Level SQL:{Colors.ENDC}\n{q}")
-    sqlite_db.connection.isolation_level = None
-    sqlite_db.connection.execute("begin")
-    benchmark_sqlite(sqlite_db, q, True)
-    sqlite_db.connection.execute("commit")
+    Colors.print_colored(f"Stock‐Level SQL:\n{q}", Colors.OKCYAN)
 
-
-
-    duckdb_db.con.begin()
-    benchmark_duckdb(duckdb_db, q, True)
-    duckdb_db.con.commit()
-
-
-    print("Running Delivery transaction")
     # SQLite
+    sqlite_db.connection.execute("BEGIN;")
+    sqlite_time = benchmark_sqlite(sqlite_db, q, True)
+    sqlite_db.connection.execute("COMMIT;")
+    Colors.print_colored(f"SQLite Time: {sqlite_time:.6f} seconds", Colors.OKGREEN)
+
+    # DuckDB
+    duckdb_db.con.begin()
+    duckdb_time = benchmark_duckdb(duckdb_db, q, True)
+    duckdb_db.con.commit()
+    Colors.print_colored(f"DuckDB Time:   {duckdb_time:.6f} seconds", Colors.OKGREEN)
+
+    content = f"StockLevel: SQLite={sqlite_time:.6f}s, DuckDB={duckdb_time:.6f}s\n"
+    write_benchmark_output("TPC-C", scale_factor, content)
+
+    # 2) Delivery
+    Colors.print_colored("Running Delivery transaction…", Colors.OKBLUE)
+
+    # SQLite
+    sqlite_db.connection.execute("BEGIN;")
     start = time.perf_counter()
     delivery_transaction(sqlite_db, w_id=warehouse_id, o_carrier_id=5)
+    sqlite_db.connection.execute("COMMIT;")
     sqlite_latency = time.perf_counter() - start
-    print(f"SQLite Delivery latency: {sqlite_latency:.6f} seconds")
+    Colors.print_colored(f"SQLite Delivery latency: {sqlite_latency:.6f} seconds", Colors.OKGREEN)
+
     # DuckDB
+    duckdb_db.con.begin()
     start = time.perf_counter()
     delivery_transaction(duckdb_db, w_id=warehouse_id, o_carrier_id=5)
+    duckdb_db.con.commit()
     duckdb_latency = time.perf_counter() - start
-    print(f"DuckDB  Delivery latency: {duckdb_latency:.6f} seconds")
+    Colors.print_colored(f"DuckDB  Delivery latency: {duckdb_latency:.6f} seconds", Colors.OKGREEN)
 
-    print("Running Order-Status transaction")
+    content = f"Delivery: SQLite={sqlite_latency:.6f}s, DuckDB={duckdb_latency:.6f}s\n"
+    write_benchmark_output("TPC-C", scale_factor, content)
+
+
+    # 3) Order-Status
+    Colors.print_colored("Running Order-Status transaction…", Colors.OKBLUE)
+
     # SQLite
+    sqlite_db.connection.execute("BEGIN;")
     start = time.perf_counter()
     order_status_transaction(sqlite_db, w_id=warehouse_id, d_id=district_id, by_name=True)
+    sqlite_db.connection.execute("COMMIT;")
     sqlite_latency = time.perf_counter() - start
-    print(f"SQLite Order-Status latency: {sqlite_latency:.6f} seconds")
+    Colors.print_colored(f"SQLite Order-Status latency: {sqlite_latency:.6f} seconds", Colors.OKGREEN)
+
     # DuckDB
+    duckdb_db.con.begin()
     start = time.perf_counter()
     order_status_transaction(duckdb_db,  w_id=warehouse_id, d_id=district_id, by_name=True)
+    duckdb_db.con.commit()
     duckdb_latency = time.perf_counter() - start
-    print(f"DuckDB  Order-Status latency: {duckdb_latency:.6f} seconds")
+    Colors.print_colored(f"DuckDB  Order-Status latency: {duckdb_latency:.6f} seconds", Colors.OKGREEN)
+
+    content = f"OrderStatus: SQLite={sqlite_latency:.6f}s, DuckDB={duckdb_latency:.6f}s\n"
+    write_benchmark_output("TPC-C", scale_factor, content)
+
 
     Colors.print_colored("Finished running TPC-C queries.", Colors.OKGREEN)
 
