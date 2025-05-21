@@ -231,6 +231,14 @@ def run_tpcc(sqlite_db: SQLite, duckdb_db: DuckDB, run_all: bool = False, reuse_
     Executes the TPC-C benchmark by setting up schemas, generating data,
     loading data, and running queries.
     """
+
+    # Create TPC-C schema in both engines
+    schema_file = f"{TPC_C}/setup.sql"
+    Colors.print_colored("Setting up TPC-C schema...", Colors.OKBLUE)
+    exec_sql_file(sqlite_db, schema_file)
+    exec_sql_file(duckdb_db, schema_file)
+    Colors.print_colored("TPC-C schema setup completed.", Colors.OKGREEN)
+
     tables = [
         "WAREHOUSE",
         "DISTRICT",
@@ -429,74 +437,48 @@ def order_status_transaction(
     db,
     w_id: int,
     d_id: int,
-    by_name: bool,
+    by_name: bool = True,
     c_last: Optional[str] = None,
     c_id:   Optional[int] = None
 ) -> Dict[str, Any]:
 
-    if by_name and c_last is None:
-        rows, _, _ = db.execute_query(f"""
-            SELECT DISTINCT c_last
-              FROM customer
-             WHERE c_w_id = {w_id}
-               AND c_d_id = {d_id}
-             LIMIT 1
-        """)
-        if not rows:
-            raise RuntimeError(f"No customers found in W={w_id}, D={d_id}")
-        c_last = rows[0][0]
-        print(f"Auto-selected last name for Order-Status: {c_last}")
+    rows, _, _ = db.execute_query(f"""
+        SELECT DISTINCT o_c_id
+          FROM orders
+         WHERE o_w_id = {w_id}
+           AND o_d_id = {d_id}
+         LIMIT 1
+    """)
+    if not rows:
+        raise RuntimeError(f"No orders found in W={w_id}, D={d_id}")
+    found_c_id = rows[0][0]
 
-    if by_name:
-        sql_c = f"""
-        WITH numbered AS (
-          SELECT
-            c_balance, c_first, c_middle, c_id,
-            ROW_NUMBER() OVER (ORDER BY c_first) AS rn,
-            COUNT(*)       OVER ()          AS cnt
-          FROM customer
-          WHERE c_w_id = {w_id}
-            AND c_d_id = {d_id}
-            AND c_last = '{c_last}'
-        )
-        SELECT c_balance, c_first, c_middle, c_id
-          FROM numbered
-         WHERE rn = (cnt + 1) / 2
-        ;
-        """
-    else:
-        if c_id is None:
-            raise ValueError("c_id must be provided when by_name=False")
-        sql_c = f"""
-        SELECT c_balance, c_first, c_middle, c_last, c_id
-          FROM customer
-         WHERE c_w_id = {w_id}
-           AND c_d_id = {d_id}
-           AND c_id   = {c_id}
-        ;
-        """
-
+    sql_c = f"""
+    SELECT c_balance, c_first, c_middle, c_last, c_id
+      FROM customer
+     WHERE c_w_id = {w_id}
+       AND c_d_id = {d_id}
+       AND c_id   = {found_c_id}
+    ;
+    """
     rows, _, _ = db.execute_query(sql_c)
     if not rows:
-        raise RuntimeError("No matching customer found")
-    if by_name:
-        c_balance, c_first, c_middle, found_c_id = rows[0]
-    else:
-        c_balance, c_first, c_middle, c_last, found_c_id = rows[0]
+        raise RuntimeError(f"Customer {found_c_id} not found in W={w_id}, D={d_id}")
+    c_balance, c_first, c_middle, c_last, c_id = rows[0]
 
     sql_o = f"""
     SELECT o_id, o_carrier_id, o_entry_d
       FROM orders
      WHERE o_w_id = {w_id}
        AND o_d_id = {d_id}
-       AND o_c_id = {found_c_id}
+       AND o_c_id = {c_id}
      ORDER BY o_id DESC
      LIMIT 1
     ;
     """
     rows, _, _ = db.execute_query(sql_o)
     if not rows:
-        raise RuntimeError("Customer has no orders")
+        raise RuntimeError(f"No orders found for customer {c_id} in W={w_id}, D={d_id}")
     o_id, o_carrier_id, o_entry_d = rows[0]
 
     sql_lines = f"""
@@ -511,11 +493,11 @@ def order_status_transaction(
 
     return {
         "customer": {
-            "c_id":       found_c_id,
-            "c_last":     c_last,
-            "c_balance":  c_balance,
-            "c_first":    c_first,
-            "c_middle":   c_middle
+            "c_id":      c_id,
+            "c_last":    c_last,
+            "c_balance": c_balance,
+            "c_first":   c_first,
+            "c_middle":  c_middle,
         },
         "order": {
             "o_id":         o_id,
