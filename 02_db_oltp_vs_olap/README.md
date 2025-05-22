@@ -4,6 +4,11 @@
 
 This project examines the performance of DuckDB and SQLite databases. The focus lies on comparing their performance in *OLTP (Online Transaction Processing)* and *OLAP (Online Analytical Processing)* workloads; the comparison utilises queries from the TPC benchmark — a standard for evaluating database performance.
 
+Data generation links:
+
+- For **TPC-H**, we use the DuckDB TPC-H Extension for data generation: [TPC-H Extension](https://duckdb.org/docs/stable/core_extensions/tpch.html#installing-and-loading).
+- For **TPC-C**, we use the following GitHub repository: [py-tpcc](https://github.com/apavlo/py-tpcc).
+
 ## OLTP and OLAP
 
 | **OLTP**                          | **OLAP**                          |
