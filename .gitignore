@@ -222,7 +222,7 @@ __pycache__
 *.png
 
 # Output files
-out
+#out
 
 # Results
 results
