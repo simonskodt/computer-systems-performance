@@ -2,7 +2,7 @@
 
 ## A Bit About This Project
 
-This project examines the performance of join operations between DuckDB and SQLite databases. The focus lies on comparing their performance in *OLTP (Online Transaction Processing)* and *OLAP (Online Analytical Processing)* workloads; the comparison utilises queries from the TPC-H benchmark — a standard for evaluating database performance.
+This project examines the performance of DuckDB and SQLite databases. The focus lies on comparing their performance in *OLTP (Online Transaction Processing)* and *OLAP (Online Analytical Processing)* workloads; the comparison utilises queries from the TPC benchmark — a standard for evaluating database performance.
 
 ## OLTP and OLAP
 
