@@ -1,4 +1,4 @@
-# Comparing Joins in DuckDB and SQLite Databases
+# Comparing DuckDB and SQLite Databases
 
 ## A Bit About This Project
 
