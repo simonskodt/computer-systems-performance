@@ -1,0 +1,15 @@
+Scale Factor: 1
+1: SQLite=5.0828s, DuckDB=0.0327s
+6: SQLite=1.1236s, DuckDB=0.0051s
+13: SQLite=19.0641s, DuckDB=0.0515s
+
+Scale Factor: 2
+1: SQLite=11.6681s, DuckDB=0.0586s
+6: SQLite=2.7540s, DuckDB=0.0087s
+13: SQLite=42.3574s, DuckDB=0.1047s
+
+Scale Factor: 5
+1: SQLite=29.9346s, DuckDB=0.1373s
+6: SQLite=6.9635s, DuckDB=0.0195s
+13: SQLite=293.7129s, DuckDB=0.2532s
+

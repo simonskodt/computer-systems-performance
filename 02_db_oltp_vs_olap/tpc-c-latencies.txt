@@ -1,0 +1,20 @@
+Scale Factor: 1
+StockLevel: SQLite=0.0020s, DuckDB=0.0032s
+Delivery: SQLite=0.1789s, DuckDB=0.1586s
+OrderStatus: SQLite=0.0003s, DuckDB=0.0030s
+
+Scale Factor: 2
+StockLevel: SQLite=0.0037s, DuckDB=0.0036s
+Delivery: SQLite=0.0993s, DuckDB=0.0459s
+OrderStatus: SQLite=0.0002s, DuckDB=0.0030s
+
+Scale Factor: 5
+StockLevel: SQLite=0.0032s, DuckDB=0.0038s
+Delivery: SQLite=0.4631s, DuckDB=0.1238s
+OrderStatus: SQLite=0.0003s, DuckDB=0.0030s
+
+Scale Factor: 20
+StockLevel: SQLite=0.0089s, DuckDB=0.0038s
+Delivery: SQLite=0.1052s, DuckDB=0.0600s
+OrderStatus: SQLite=0.0005s, DuckDB=0.0031s
+
